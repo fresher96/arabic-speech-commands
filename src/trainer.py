@@ -17,6 +17,7 @@ class ModelTrainer():
 
         self.optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum);
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        model.to(self.device);
 
     def train_one_epoch(self, epoch):
 
