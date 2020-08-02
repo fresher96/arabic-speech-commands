@@ -12,13 +12,11 @@ from src.ClassDict import ClassDict;
 
 class ASCDataset(torch.utils.data.Dataset):
 
-    def __init__(self, dataset, transform, nsilence):
+    def __init__(self, dataset, transform, s_transform, nsilence):
         super().__init__()
 
         self.transform = transform;
-
-        # TODO: delete
-        dataset = [(x, dataset[x]) for x in dataset];
+        self.s_transform = s_transform;
 
         dataset = list(zip(*dataset))
         self.audio_files = list(dataset[0])
@@ -34,8 +32,7 @@ class ASCDataset(torch.utils.data.Dataset):
     def load_silence(self):
         # TODO
         signal = np.random.randn(16000);
-        transform = self.transform.transforms[-1];
-        tensor = transform(signal);
+        tensor = self.s_transform(signal);
         return tensor;
 
     def load_audio(self, path):
@@ -57,17 +54,26 @@ class ASCDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.audio_labels) + self.nsilence
 
-
 def get_transform(args):
     # transform = transforms.Compose([transforms.Resize(opt.isize),
     #                                 transforms.CenterCrop(opt.isize),
     #                                 transforms.ToTensor(),
     #                                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
 
+    def xxx(x):
+        print(x);
+        return x;
+
     test_trasform = transforms.Compose([
-        torchaudio.transforms.MFCC(),
-        transforms.ToTensor(),
+        # transforms.ToTensor(),
+        # Lambda(xxx),
+        Lambda(lambda x: torch.from_numpy(x / 2**15).float()),
+        # Lambda(xxx),
+        torchaudio.transforms.MFCC(n_mfcc=args.nmfcc),
+        # Lambda(xxx),
     ]);
+
+    silence_transform = test_trasform;
 
     train_transform = transforms.Compose([
         # transforms.TimeShift(args.left_shift, args.right_shift),
@@ -76,17 +82,21 @@ def get_transform(args):
     ]);
 
 
-    return {'train': train_transform, 'val': test_trasform, 'test': test_trasform};
+    return {'train': train_transform, 'val': test_trasform, 'test': test_trasform}, silence_transform;
 
 
 def get_dataloader(args):
     splits = ['train', 'val', 'test']
 
-    transform = get_transform(args);
+    transform, s_transform = get_transform(args);
 
     dataset = utils.split(args.dataroot, args.pct_val, args.pct_test);
+    # TODO: delete
+    dataset = {split: [(x, dataset[split][x]) for x in dataset[split]] for split in splits};
+    dataset['train'] = dataset['train'][:]
 
-    dataset = {split: ASCDataset(dataset[split], transform[split], args.nsilence)
+
+    dataset = {split: ASCDataset(dataset[split], transform[split], s_transform, args.nsilence)
                for split in splits}
 
     dataloader = {split: torch.utils.data.DataLoader(dataset=dataset[split],
@@ -103,3 +113,22 @@ signal:         1D  args.signal_sr * args.signal_len
 spectrogram:    2D  height = args.nmfcc * width = args.nfilter
 tensor:         same
 """
+
+
+class Lambda(object):
+    """Apply a user-defined lambda as a transform.
+
+    Args:
+        lambd (function): Lambda/function to be used for transform.
+    """
+
+    def __init__(self, lambd):
+        assert callable(lambd), repr(type(lambd).__name__) + " object is not callable"
+        self.lambd = lambd
+
+    def __call__(self, img):
+        return self.lambd(img)
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
+

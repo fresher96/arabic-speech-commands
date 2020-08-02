@@ -16,5 +16,4 @@ class LogisticRegression(nn.Module):
     def forward(self, x):
         x = x.view(-1, self.input_shape)
         x = self.fc(x);
-        x = F.relu(x);
         return x

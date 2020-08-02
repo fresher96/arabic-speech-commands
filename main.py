@@ -18,9 +18,12 @@ def run():
         trainer.test();
     else:
         trainer.train();
+        print('done');
+        exit();
 
 
 
 
 if __name__ == '__main__':
     run();
+    exit();
