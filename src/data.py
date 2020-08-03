@@ -84,7 +84,7 @@ def get_transform(args):
 
 
 def get_dataloader(args):
-    args.nclass = ClassDict.len() + 1;
+    args.nclass = ClassDict.len() + (args.nsilence != 0);
     splits = ['train', 'val', 'test']
 
     transform, s_transform = get_transform(args);

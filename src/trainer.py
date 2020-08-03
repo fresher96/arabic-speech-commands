@@ -31,8 +31,9 @@ class ModelTrainer():
             raise Exception('--optimizer should be one of {sgd, adam}');
 
 
-        self.experiment = Experiment(api_key=args.comet_key, auto_weight_logging=True,
-                                     project_name=args.comet_project, workspace=args.comet_workspace)
+        self.experiment = Experiment(api_key=args.comet_key,
+                                     project_name=args.comet_project, workspace=args.comet_workspace,
+                                     auto_weight_logging=True, auto_metric_logging=False)
 
         self.experiment.set_name(args.name);
         self.experiment.log_parameters(vars(args));
@@ -111,7 +112,8 @@ class ModelTrainer():
         test_loss = 0
         correct = 0
 
-        cm = np.zeros((ClassDict.len() + 1, ClassDict.len() + 1));
+        labels = list(range(self.args.nclass));
+        cm = np.zeros((len(labels), len(labels)));
 
         with torch.no_grad():
             for data, target in tqdm(val_loader, leave=True, total=len(val_loader)):
@@ -123,7 +125,7 @@ class ModelTrainer():
 
                 pred = pred.view_as(target).data.numpy();
                 target = target.data.numpy();
-                cm += confusion_matrix(target, pred, labels=list(range(ClassDict.len() + 1)));
+                cm += confusion_matrix(target, pred, labels=labels);
 
 
         test_loss /= len(val_loader.dataset)
@@ -137,10 +139,9 @@ class ModelTrainer():
         self.experiment.log_metrics(res, step=comet_offset, epoch=epoch);
         self.experiment.log_confusion_matrix(
             matrix=cm,
+            labels=[ClassDict.getName(x) for x in labels],
             title='confusion matrix after epoch %03d' % epoch,
-            file_name="confusion_matrix_%03d.json" % epoch,
-            index_to_example_function = lambda x: ClassDict.getName(x),
-        )
+            file_name="confusion_matrix_%03d.json" % epoch)
 
         return res;
 

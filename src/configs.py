@@ -19,15 +19,14 @@ def set_defaults():
     parser.add_argument('--model', type=str, default='vanilla', help='')
     parser.add_argument('--nepoch', type=int, default=3, help='number of epochs to train for')
     parser.add_argument('--batchsize', type=int, default=64, help='input batch size')
-    parser.add_argument('--metric', type=str, default='loss', help='')
+    parser.add_argument('--metric', type=str, default='acc', help='')
     parser.add_argument('--momentum', type=int, default=0.9, help='')
     parser.add_argument('--lr', type=float, default=0.00002, help='learning rate')
     parser.add_argument('--beta1', type=float, default=0.5, help='')
     parser.add_argument('--optimizer', type=str, default='sgd', help='adam | sgd')
 
     # data files configs
-    parser.add_argument('--data_root', default=os.path.join('Arabic_Speech_Commands_Dataset', 'speech_commands'),
-                        help='path to dataset')
+    parser.add_argument('--data_root', default='.', help='path to dataset')
     parser.add_argument('--pct_val', type=float, default=0.20, help='')
     parser.add_argument('--pct_test', type=float, default=0.20, help='')
 
