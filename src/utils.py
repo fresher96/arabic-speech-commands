@@ -1,6 +1,7 @@
 import os
 from math import ceil
 from collections import defaultdict
+import pandas as pd
 
 
 # Ensure that the current file is a wave file
@@ -29,24 +30,36 @@ def group_by_person(files_list):
 
 
 # Dataset splitting: training set, validation set, test set
-def split(dataset_path, validation_part=0.2, test_part=0.2):
+def split(args, validation_part=0.2, test_part=0.2):
+    dataset_path = os.path.join(args.data_root, 'dataset')
     dataset_files = get_dataset_files(dataset_path)
-    training_files, validation_files, test_files = {}, {}, {}
+    training_files, validation_files, test_files = [], [], []
     for class_name, files_list in dataset_files.items():
         files_lists = group_by_person(files_list)
         num_test = ceil(test_part * len(files_lists))
         num_validation = ceil(validation_part * len(files_lists))
         for i in range(num_test):
             for file_name in files_lists[i]:
-                file_path = os.path.join(dataset_path, class_name, file_name)
-                test_files[file_path] = class_name
+                file_path = os.path.join('dataset', class_name, file_name)
+                test_files.append((file_path, class_name))
         for i in range(num_test, num_test + num_validation):
             for file_name in files_lists[i]:
-                file_path = os.path.join(dataset_path, class_name, file_name)
-                validation_files[file_path] = class_name
+                file_path = os.path.join('dataset', class_name, file_name)
+                validation_files.append((file_path, class_name))
         for i in range(num_test + num_validation, len(files_lists)):
             for file_name in files_lists[i]:
-                file_path = os.path.join(dataset_path, class_name, file_name)
-                training_files[file_path] = class_name
+                file_path = os.path.join('dataset', class_name, file_name)
+                training_files.append((file_path, class_name))
     return {'train': training_files, 'val': validation_files, 'test': test_files}
 
+
+def split_to_csv(args, dataset_splits):
+    d = defaultdict(lambda: defaultdict(list))
+    for set_name, set_data in dataset_splits.items():
+        for file_path, class_name in set_data:
+            d[set_name]['file'].append(file_path)
+            d[set_name]['class'].append(class_name)
+
+    for set_name, set_dict in d.items():
+        data_frame = pd.DataFrame(set_dict)
+        data_frame.to_csv(set_name + '_' + args.features_name + '.csv', index=False)
