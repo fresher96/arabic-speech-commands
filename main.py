@@ -11,7 +11,7 @@ def run():
 
     dataloader = get_dataloader(args);
 
-    model = CompressModel(args);
+    model = LogisticRegression(args);
 
     trainer = ModelTrainer(model, dataloader, args);
 

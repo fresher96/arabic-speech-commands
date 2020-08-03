@@ -20,7 +20,7 @@ def set_defaults():
     parser.add_argument('--batchsize', type=int, default=64, help='input batch size')
     parser.add_argument('--metric', type=str, default='loss', help='')
     parser.add_argument('--momentum', type=int, default=0.9, help='')
-    parser.add_argument('--lr', type=float, default=0.0002, help='learning rate')
+    parser.add_argument('--lr', type=float, default=0.00002, help='learning rate')
     parser.add_argument('--beta1', type=float, default=0.5, help='')
     parser.add_argument('--optimizer', type=str, default='sgd', help='adam | sgd')
 
