@@ -1,15 +1,18 @@
-import torch;
-import numpy as np;
+import torch
+import numpy as np
 
-from src.utils import *;
+from src.utils import *
+from python_speech_features import mfcc, logfbank
 
-class Random_Transform():
+
+class Random_Transform(object):
+
     def __init__(self, height, width):
-        self.height = height;
-        self.width = width;
+        self.height = height
+        self.width = width
 
     def __call__(self, signal):
-        return np.random.randn(self.height, self.width);
+        return np.random.randn(self.height, self.width)
 
 
 class Compose(object):
@@ -34,7 +37,7 @@ class Compose(object):
 class ToTensor(object):
 
     def __call__(self, spectrogram):
-        return torch.from_numpy(spectrogram).float();
+        return torch.from_numpy(spectrogram).float()
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
@@ -43,8 +46,8 @@ class ToTensor(object):
 class TimeShift(object):
 
     def __init__(self, left, right):
-        self.left = left;
-        self.right = right;
+        self.left = left
+        self.right = right
 
     def __call__(self, signal):
         return signal
@@ -53,14 +56,27 @@ class TimeShift(object):
         return self.__class__.__name__ + '()'
 
 
-class MFCC(object):
+class LogFBEs(object):
 
-    def __init__(self, param1, param2):
-        pass;
+    def __init__(self, n_filters):
+        self.n_filters = n_filters
 
     def __call__(self, signal):
-        spectrogram = signal;
-        return spectrogram;
+        features = logfbank(signal, nfilt=self.n_filters)
+        return features
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
+
+
+class MFCCs(object):
+
+    def __init__(self, n_filters):
+        self.n_filters = n_filters
+
+    def __call__(self, signal):
+        features = mfcc(signal, nfilt=self.n_filters)
+        return features
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
