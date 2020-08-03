@@ -12,11 +12,12 @@ from src.ClassDict import ClassDict;
 
 class ASCDataset(torch.utils.data.Dataset):
 
-    def __init__(self, dataset, transform, s_transform, nsilence):
+    def __init__(self, data_root, dataset, transform, s_transform, nsilence):
         super().__init__()
 
         self.transform = transform;
         self.s_transform = s_transform;
+        self.data_root = data_root;
 
         dataset = list(zip(*dataset))
         self.audio_files = list(dataset[0])
@@ -39,7 +40,7 @@ class ASCDataset(torch.utils.data.Dataset):
         # TODO
         # len = 16000;
         # signal = np.random.randn(len);
-
+        path = os.path.join(self.data_root, path);
         (_, signal) = wavfile.read(path);
 
         tensor = self.transform(signal);
@@ -88,13 +89,11 @@ def get_dataloader(args):
 
     transform, s_transform = get_transform(args);
 
-    dataset = utils.split(args.dataroot, args.pct_val, args.pct_test);
-    # TODO: delete
-    dataset = {split: [(x, dataset[split][x]) for x in dataset[split]] for split in splits};
-    dataset['train'] = dataset['train'][:args.debug]
+    dataset = utils.split(args, args.pct_val, args.pct_test);
+    if(args.debug != -1): dataset['train'] = dataset['train'][:args.debug]
 
 
-    dataset = {split: ASCDataset(dataset[split], transform[split], s_transform, args.nsilence)
+    dataset = {split: ASCDataset(args.data_root, dataset[split], transform[split], s_transform, args.nsilence)
                for split in splits}
 
     dataloader = {split: torch.utils.data.DataLoader(dataset=dataset[split],

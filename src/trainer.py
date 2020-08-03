@@ -7,7 +7,9 @@ from torch import optim
 from tqdm import tqdm
 import numpy as np;
 import random;
+from sklearn.metrics import confusion_matrix
 
+from src.ClassDict import ClassDict;
 
 class ModelTrainer():
 
@@ -27,13 +29,13 @@ class ModelTrainer():
         else:
             raise Exception('--optimizer should be one of {sgd, adam}');
 
-        if(not args.test):
-            self.experiment = Experiment(api_key=args.comet_key,
-                                         project_name=args.comet_project, workspace=args.comet_workspace)
 
-            self.experiment.log_parameters(vars(args));
-            self.experiment.set_model_graph(str(self.model));
-            self.experiment.set_name(args.name);
+        self.experiment = Experiment(api_key=args.comet_key, auto_weight_logging=True,
+                                     project_name=args.comet_project, workspace=args.comet_workspace)
+
+        self.experiment.set_name(args.name);
+        self.experiment.log_parameters(vars(args));
+        self.experiment.set_model_graph(str(self.model));
 
     def train_one_epoch(self, epoch):
 
@@ -41,6 +43,8 @@ class ModelTrainer():
         train_loader = self.data['train'];
         train_loss = 0
         correct = 0
+
+        comet_offset = epoch * len(train_loader);
 
         for batch_idx, (data, target) in tqdm(enumerate(train_loader), leave=True, total=len(train_loader)):
             data, target = data.to(self.device), target.to(self.device)
@@ -56,15 +60,16 @@ class ModelTrainer():
             train_loss += loss.item();
             correct += acc;
 
-            # loss = loss.item() / len(data);
+            loss = loss.item() / len(data);
             acc = 100. * acc / len(data);
 
-            self.experiment.log_metric('batch_loss', loss, batch_idx);
-            self.experiment.log_metric('batch_acc', acc, batch_idx);
+            comet_step = comet_offset + batch_idx;
+            self.experiment.log_metric('batch_loss', loss, comet_step, epoch);
+            self.experiment.log_metric('batch_acc', acc, comet_step, epoch);
 
             if (batch_idx + 1) % self.args.frq_log == 0:
-                self.experiment.log_metric('log_loss', loss, batch_idx);
-                self.experiment.log_metric('log_acc', acc, batch_idx);
+                self.experiment.log_metric('log_loss', loss, comet_step, epoch);
+                self.experiment.log_metric('log_acc', acc, comet_step, epoch);
                 print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tAcc: {:.2f}%'.format(
                     epoch + 1, (batch_idx + 1) * len(data), len(train_loader.dataset),
                            100. * (batch_idx + 1) / len(train_loader), loss, acc))
@@ -72,12 +77,13 @@ class ModelTrainer():
         train_loss /= len(train_loader.dataset)
         acc = 100. * correct / len(train_loader.dataset);
 
-        epoch_log_step = (epoch + 1) * (len(train_loader) - 1);
-        self.experiment.log_metric('epoch_loss', train_loss, epoch_log_step);
-        self.experiment.log_metric('epoch_acc', acc, epoch_log_step);
+        comet_step = comet_offset + len(train_loader) - 1;
+        self.experiment.log_metric('loss', train_loss, comet_step, epoch);
+        self.experiment.log_metric('acc', acc, comet_step, epoch);
 
         print('Epoch: {} [Done]\tLoss: {:.4f}\tAccuracy: {}/{} ({:.2f}%)'.format(
             epoch + 1, train_loss, correct, len(train_loader.dataset), acc))
+
 
     def train(self):
 
@@ -88,10 +94,10 @@ class ModelTrainer():
             with self.experiment.train():
                 self.train_one_epoch(epoch)
 
-            with self.experiment.test():
+            with self.experiment.validate():
                 print("\nvalidation...");
-                res = self.val(self.data['val'])
-                self.experiment.log_metrics(res, step=(epoch + 1) * (len(self.data['train']) - 1));
+                comet_offset = (epoch + 1) * len(self.data['train']) - 1;
+                res = self.val(self.data['val'], comet_offset, epoch)
 
             if res[self.metric] > best:
                 best = res[self.metric]
@@ -99,10 +105,16 @@ class ModelTrainer():
 
         print(">> Training model %s.[Done]" % self.model.name)
 
-    def val(self, val_loader):
+    def val(self, val_loader, comet_offset=-1, epoch=-1):
         self.model.eval()
         test_loss = 0
         correct = 0
+
+        test_targets = None;
+        test_predictions = None;
+
+        # cm = cm.compute_matrix(y_true, y_predicted)
+
         with torch.no_grad():
             for data, target in tqdm(val_loader, leave=True, total=len(val_loader)):
                 data, target = data.to(self.device), target.to(self.device)
@@ -111,6 +123,12 @@ class ModelTrainer():
                 pred = output.argmax(dim=1, keepdim=True)
                 correct += pred.eq(target.view_as(pred)).sum().item()
 
+                pred = pred.view_as(target).data.numpy();
+                test_predictions = pred if test_predictions is None else np.concatenate((test_predictions, pred));
+
+                target = target.data.numpy();
+                test_targets = target if test_targets is None else np.concatenate((test_targets, target));
+
         test_loss /= len(val_loader.dataset)
         accuracy = 100. * correct / len(val_loader.dataset);
 
@@ -118,9 +136,22 @@ class ModelTrainer():
             test_loss, correct, len(val_loader.dataset), accuracy))
 
         res = {'loss': test_loss, 'acc': accuracy};
+        self.experiment.log_metrics(res, step=comet_offset, epoch=epoch);
+
+        # test_targets = list(test_targets);
+        matrix = confusion_matrix(test_targets, test_predictions)
+
+        self.experiment.log_confusion_matrix(
+            matrix=matrix,
+            title='confusion matrix after epoch %03d' % epoch,
+            file_name="confusion_matrix_%03d.json" % epoch,
+            # labels=ClassDict.dct,
+        )
+
         return res;
 
     def test(self):
         # load_wights();
-        print('\ntesting....');
-        res = self.val(self.data['test']);
+        with self.experiment.test():
+            print('\ntesting....');
+            res = self.val(self.data['test']);
