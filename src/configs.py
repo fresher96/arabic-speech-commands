@@ -23,7 +23,7 @@ def set_defaults():
     parser.add_argument('--lr', type=float, default=0.00002, help='learning rate')
     parser.add_argument('--momentum', type=int, default=0.9, help='')
     parser.add_argument('--beta1', type=float, default=0.9, help='')
-    parser.add_argument('--optimizer', type=str, default='sgd', help='adam | sgd')
+    parser.add_argument('--optimizer', type=str, default='adam', help='adam | sgd')
 
     # data files configs
     parser.add_argument('--data_root', default='.', help='path to dataset')
