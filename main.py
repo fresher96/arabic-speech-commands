@@ -19,7 +19,6 @@ def run():
         trainer.test();
     else:
         trainer.train();
-        trainer.test();
 
 
 
@@ -27,5 +26,4 @@ def run():
 
 if __name__ == '__main__':
     run();
-    print('done');
-    exit();
+

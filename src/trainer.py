@@ -30,6 +30,9 @@ class ModelTrainer():
         else:
             raise Exception('--optimizer should be one of {sgd, adam}');
 
+        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.1, patience=10,
+                                                              verbose=True, threshold=0.0001, threshold_mode='rel',
+                                                              cooldown=0, min_lr=0, eps=1e-08);
 
         self.experiment = Experiment(api_key=args.comet_key,
                                      project_name=args.comet_project, workspace=args.comet_workspace,
@@ -104,6 +107,8 @@ class ModelTrainer():
             if res[self.metric] > best:
                 best = res[self.metric]
                 self.save_weights(epoch)
+
+            self.scheduler.step(res['loss'])
 
         print(">> Training model %s.[Done]" % self.model.name)
 

@@ -99,18 +99,10 @@ def get_dataloader(args):
 
     dataloader = {split: torch.utils.data.DataLoader(dataset=dataset[split],
                                                      batch_size=args.batchsize,
-                                                     shuffle=(split == 'train'),
-                                                     worker_init_fn=(None if args.seed == -1
-                                                     else lambda _: np.random.seed(args.seed)))
+                                                     shuffle=(split == 'train'))
                   for split in splits}
 
     return dataloader
-
-"""
-signal:         1D  args.signal_sr * args.signal_len
-spectrogram:    2D  height = args.nmfcc * width = args.nfilter
-tensor:         same
-"""
 
 
 class Lambda(object):
