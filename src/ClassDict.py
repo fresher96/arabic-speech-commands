@@ -5,12 +5,12 @@ class ClassDict():
 
     @staticmethod
     def getId(name):
-        return ClassDict.dct.index(name);
+        return ClassDict.dct.index(name)
 
     @staticmethod
     def getName(id):
-        return ClassDict.dct[id];
+        return ClassDict.dct[id]
 
     @staticmethod
     def len():
-        return len(ClassDict.dct);
+        return len(ClassDict.dct)
