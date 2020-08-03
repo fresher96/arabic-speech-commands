@@ -11,6 +11,7 @@ from sklearn.metrics import confusion_matrix
 
 from src.ClassDict import ClassDict;
 
+
 class ModelTrainer():
 
     def __init__(self, model, dataloader, args):
@@ -87,7 +88,7 @@ class ModelTrainer():
 
     def train(self):
 
-        best = 0
+        best = -1
 
         print(">> Training %s" % self.model.name)
         for epoch in range(self.args.nepoch):
@@ -101,7 +102,7 @@ class ModelTrainer():
 
             if res[self.metric] > best:
                 best = res[self.metric]
-                # self.save_weights(self.epoch)
+                self.save_weights(epoch)
 
         print(">> Training model %s.[Done]" % self.model.name)
 
@@ -110,10 +111,7 @@ class ModelTrainer():
         test_loss = 0
         correct = 0
 
-        test_targets = None;
-        test_predictions = None;
-
-        # cm = cm.compute_matrix(y_true, y_predicted)
+        cm = np.zeros((ClassDict.len() + 1, ClassDict.len() + 1));
 
         with torch.no_grad():
             for data, target in tqdm(val_loader, leave=True, total=len(val_loader)):
@@ -124,10 +122,9 @@ class ModelTrainer():
                 correct += pred.eq(target.view_as(pred)).sum().item()
 
                 pred = pred.view_as(target).data.numpy();
-                test_predictions = pred if test_predictions is None else np.concatenate((test_predictions, pred));
-
                 target = target.data.numpy();
-                test_targets = target if test_targets is None else np.concatenate((test_targets, target));
+                cm += confusion_matrix(target, pred, labels=list(range(ClassDict.len() + 1)));
+
 
         test_loss /= len(val_loader.dataset)
         accuracy = 100. * correct / len(val_loader.dataset);
@@ -136,22 +133,41 @@ class ModelTrainer():
             test_loss, correct, len(val_loader.dataset), accuracy))
 
         res = {'loss': test_loss, 'acc': accuracy};
+
         self.experiment.log_metrics(res, step=comet_offset, epoch=epoch);
-
-        # test_targets = list(test_targets);
-        matrix = confusion_matrix(test_targets, test_predictions)
-
         self.experiment.log_confusion_matrix(
-            matrix=matrix,
+            matrix=cm,
             title='confusion matrix after epoch %03d' % epoch,
             file_name="confusion_matrix_%03d.json" % epoch,
-            # labels=ClassDict.dct,
+            index_to_example_function = lambda x: ClassDict.getName(x),
         )
 
         return res;
 
     def test(self):
-        # load_wights();
+        self.load_weights();
         with self.experiment.test():
             print('\ntesting....');
             res = self.val(self.data['test']);
+
+
+    def save_weights(self, epoch:int):
+
+        weight_dir = os.path.join(self.args.outf, self.args.name, 'weights')
+        if not os.path.exists(weight_dir): os.makedirs(weight_dir)
+
+        torch.save({'epoch': epoch, 'state_dict': self.model.state_dict()}, os.path.join(weight_dir, 'model.pth'))
+
+
+    def load_weights(self):
+
+        path_g = self.args.weights_path;
+
+        if path_g is None:
+            weight_dir = os.path.join(self.args.outf, self.args.name, 'weights')
+            path_g = os.path.join(weight_dir, 'model.pth')
+
+        print('>> Loading weights...')
+        weights_g = torch.load(path_g)['state_dict']
+        self.model.load_state_dict(weights_g)
+        print('   Done.')

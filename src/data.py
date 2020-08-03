@@ -90,8 +90,9 @@ def get_dataloader(args):
     transform, s_transform = get_transform(args);
 
     dataset = utils.split(args, args.pct_val, args.pct_test);
-    if(args.debug != -1): dataset['train'] = dataset['train'][:args.debug]
 
+    if(args.debug != -1):
+        dataset = {split: dataset[split][:args.debug] for split in splits}
 
     dataset = {split: ASCDataset(args.data_root, dataset[split], transform[split], s_transform, args.nsilence)
                for split in splits}

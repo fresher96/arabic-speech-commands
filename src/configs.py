@@ -17,7 +17,7 @@ def set_defaults():
 
     # training configs
     parser.add_argument('--model', type=str, default='vanilla', help='')
-    parser.add_argument('--nepoch', type=int, default=2, help='number of epochs to train for')
+    parser.add_argument('--nepoch', type=int, default=3, help='number of epochs to train for')
     parser.add_argument('--batchsize', type=int, default=64, help='input batch size')
     parser.add_argument('--metric', type=str, default='loss', help='')
     parser.add_argument('--momentum', type=int, default=0.9, help='')
@@ -37,8 +37,9 @@ def set_defaults():
     parser.add_argument('--outf', default='./output', help='folder to output images and model checkpoints')
     parser.add_argument('--seed', default=8, type=int, help='manual seed')
     parser.add_argument('--frq_log', type=int, default=25, help='frequency of showing training results on console')
+    parser.add_argument('--debug', type=int, default=-1, help='')
     parser.add_argument('--test', action='store_true', default=False, help='load weights and run on test set')
-    parser.add_argument('--debug', type=int, default=1, help='')
+    parser.add_argument('--weights_path', type=str, default=None, help='')
 
     # comet_ml configs
     parser.add_argument('--comet_key', type=str, default='bLjz3xx3gKDZwM7Hm0Kcgbpww', help='');

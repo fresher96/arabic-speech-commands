@@ -9,7 +9,7 @@ class ClassDict():
 
     @staticmethod
     def getName(id):
-        return ClassDict.dct[id]
+        return ClassDict.dct[id] if id < ClassDict.len() else 'silence';
 
     @staticmethod
     def len():
