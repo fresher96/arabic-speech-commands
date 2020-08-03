@@ -10,7 +10,7 @@ def run():
 
     dataloader = get_dataloader(args);
 
-    model = LogisticRegression(args);
+    model = ConvNet(args);
 
     trainer = ModelTrainer(model, dataloader, args);
 
