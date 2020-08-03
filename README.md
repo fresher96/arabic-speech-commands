@@ -1,1 +1,8 @@
-# Arabic-Speech-Commands
+# Arabic Speech Commands
+Todo ...
+
+## Data
+Todo ...
+
+## License
+Todo ...
