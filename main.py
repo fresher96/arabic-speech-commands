@@ -1,3 +1,4 @@
+from comet_ml import Experiment
 from src.configs import get_args
 from src.data import get_dataloader
 from src.trainer import ModelTrainer

@@ -1,4 +1,5 @@
 import os;
+from comet_ml import Experiment
 import torch;
 from torch import nn;
 from torch.nn import functional as F
@@ -6,7 +7,6 @@ from torch import optim
 from tqdm import tqdm
 import numpy as np;
 import random;
-from comet_ml import Experiment
 
 
 class ModelTrainer():
@@ -51,19 +51,22 @@ class ModelTrainer():
             train_loss += loss.item();
             correct += acc;
 
+            loss = loss.item() / len(data);
+            acc = 100. * acc / len(data);
+
             # self.experiment.log_metric('loss', loss.item(), batch_idx, epoch);
             # self.experiment.log_metric('loss', loss.item(), batch_idx, epoch);
 
             if (batch_idx + 1) % self.args.frq_log == 0:
-                print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tAcc: {:.2f}'.format(
+                print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tAcc: {:.2f}%'.format(
                     epoch + 1, (batch_idx + 1) * len(data), len(train_loader.dataset),
-                           100. * (batch_idx + 1) / len(train_loader), loss.item(), acc))
-                print('Evaluation: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)'.format(
-                    test_loss, correct, len(val_loader.dataset), accuracy))
+                           100. * (batch_idx + 1) / len(train_loader), loss, acc))
 
-        print('Epoch: {} [Done]\tLoss: {:.6f}\tAcc: {:.2f}'.format(
-            epoch + 1, (batch_idx + 1) * len(data), len(train_loader.dataset),
-            100. * (batch_idx + 1) / len(train_loader), loss.item(), acc))
+        train_loss /= len(train_loader.dataset)
+        acc = 100. * correct / len(train_loader.dataset);
+
+        print('Epoch: {} [Done]\tLoss: {:.4f}\tAccuracy: {}/{} ({:.2f}%)'.format(
+            epoch + 1, train_loss, correct, len(train_loader.dataset), acc))
 
     def train(self):
 
