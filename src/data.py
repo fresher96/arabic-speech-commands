@@ -1,13 +1,13 @@
 import torch
-import numpy as np;
-import os;
-from scipy.io import wavfile;
+import numpy as np
+import os
+from scipy.io import wavfile
 import torchaudio
 
 
-from src import utils;
-from src import transforms;
-from src.ClassDict import ClassDict;
+from src import utils
+from src import transforms
+from src.ClassDict import ClassDict
 
 
 class ASCDataset(torch.utils.data.Dataset):
@@ -15,35 +15,35 @@ class ASCDataset(torch.utils.data.Dataset):
     def __init__(self, dataset, transform, s_transform, nsilence):
         super().__init__()
 
-        self.transform = transform;
-        self.s_transform = s_transform;
+        self.transform = transform
+        self.s_transform = s_transform
 
         dataset = list(zip(*dataset))
         self.audio_files = list(dataset[0])
         self.audio_labels = dataset[1]
-        self.audio_labels = [ClassDict.getId(name) for name in self.audio_labels];
+        self.audio_labels = [ClassDict.getId(name) for name in self.audio_labels]
 
-        if(nsilence == -1):
-            nsilence = len(self.audio_files) // len(set(self.audio_labels));
+        if nsilence == -1:
+            nsilence = len(self.audio_files) // len(set(self.audio_labels))
 
-        self.nsilence = nsilence;
-        self.silence_label = ClassDict.len();
+        self.nsilence = nsilence
+        self.silence_label = ClassDict.len()
 
     def load_silence(self):
         # TODO
-        signal = np.random.randn(16000);
-        tensor = self.s_transform(signal);
-        return tensor;
+        signal = np.random.randn(16000)
+        tensor = self.s_transform(signal)
+        return tensor
 
     def load_audio(self, path):
         # TODO
         # len = 16000;
         # signal = np.random.randn(len);
 
-        (_, signal) = wavfile.read(path);
+        (_, signal) = wavfile.read(path)
 
-        tensor = self.transform(signal);
-        return tensor;
+        tensor = self.transform(signal)
+        return tensor
 
     def __getitem__(self, index):
         if index >= len(self.audio_labels):
@@ -54,6 +54,7 @@ class ASCDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.audio_labels) + self.nsilence
 
+
 def get_transform(args):
     # transform = transforms.Compose([transforms.Resize(opt.isize),
     #                                 transforms.CenterCrop(opt.isize),
@@ -61,8 +62,8 @@ def get_transform(args):
     #                                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
 
     def xxx(x):
-        print(x);
-        return x;
+        print(x)
+        return x
 
     test_trasform = transforms.Compose([
         # transforms.ToTensor(),
@@ -71,16 +72,15 @@ def get_transform(args):
         # Lambda(xxx),
         torchaudio.transforms.MFCC(n_mfcc=args.nmfcc),
         # Lambda(xxx),
-    ]);
+    ])
 
-    silence_transform = test_trasform;
+    silence_transform = test_trasform
 
     train_transform = transforms.Compose([
         # transforms.TimeShift(args.left_shift, args.right_shift),
         # transforms.ToTensor(),
         test_trasform,
-    ]);
-
+    ])
 
     return {'train': train_transform, 'val': test_trasform, 'test': test_trasform}, silence_transform;
 
@@ -88,13 +88,12 @@ def get_transform(args):
 def get_dataloader(args):
     splits = ['train', 'val', 'test']
 
-    transform, s_transform = get_transform(args);
+    transform, s_transform = get_transform(args)
 
-    dataset = utils.split(args.dataroot, args.pct_val, args.pct_test);
+    dataset = utils.split(args.dataroot, args.pct_val, args.pct_test)
     # TODO: delete
-    dataset = {split: [(x, dataset[split][x]) for x in dataset[split]] for split in splits};
+    dataset = {split: [(x, dataset[split][x]) for x in dataset[split]] for split in splits}
     dataset['train'] = dataset['train'][:]
-
 
     dataset = {split: ASCDataset(dataset[split], transform[split], s_transform, args.nsilence)
                for split in splits}

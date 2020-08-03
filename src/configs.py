@@ -4,6 +4,7 @@ import numpy as np
 import random
 import torch
 
+
 def set_defaults():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -13,13 +14,11 @@ def set_defaults():
     parser.add_argument('--nfilter', type=int, default=81, help='')
     parser.add_argument('--nsilence', type=int, default=-1, help='')
 
-
     parser.add_argument('--model', type=str, default='vanilla', help='chooses which model to use. ganomaly')
     parser.add_argument('--nclass', type=int, default=41, help='')
     parser.add_argument('--momentum', type=int, default=0.9, help='')
     parser.add_argument('--lr', type=float, default=0.0002, help='learning rate')
     parser.add_argument('--epochs', type=int, default=5, help='number of epochs to train for')
-
 
     parser.add_argument('--dataroot', default=os.path.join('Arabic_Speech_Commands_Dataset', 'speech_commands'), help='path to dataset')
     parser.add_argument('--pct_val', type=float, default=0.20, help='')
@@ -33,11 +32,11 @@ def set_defaults():
     parser.add_argument('--frq_log', type=int, default=25, help='frequency of showing training results on console')
     parser.add_argument('--test', action='store_true', default=False, help='load weights and run on test set')
 
-    return parser.parse_args();
+    return parser.parse_args()
 
 
 def get_args():
-    args = set_defaults();
+    args = set_defaults()
 
     expr_dir = os.path.join(args.outf, args.name)
     if not os.path.isdir(expr_dir):
@@ -50,13 +49,12 @@ def get_args():
             f.write('%s: %s\n' % (str(k), str(v)))
         f.write('-------------- END --------------\n')
 
-    if (args.seed != -1):
-        print(args.seed);
+    if args.seed != -1:
+        print(args.seed)
         random.seed(args.seed)
         torch.manual_seed(args.seed)
         torch.cuda.manual_seed_all(args.seed)
         np.random.seed(args.seed)
         torch.backends.cudnn.deterministic = True
-
 
     return args
