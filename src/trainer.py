@@ -30,7 +30,7 @@ class ModelTrainer():
         else:
             raise Exception('--optimizer should be one of {sgd, adam}');
 
-        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.1, patience=10,
+        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.1, patience=5,
                                                               verbose=True, threshold=0.0001, threshold_mode='rel',
                                                               cooldown=0, min_lr=0, eps=1e-08);
 
@@ -128,8 +128,8 @@ class ModelTrainer():
                 pred = output.argmax(dim=1, keepdim=True)
                 correct += pred.eq(target.view_as(pred)).sum().item()
 
-                pred = pred.view_as(target).data.numpy();
-                target = target.data.numpy();
+                pred = pred.view_as(target).data.cpu().numpy();
+                target = target.data.cpu().numpy();
                 cm += confusion_matrix(target, pred, labels=labels);
 
 
