@@ -10,7 +10,7 @@ def run():
 
     dataloader = get_dataloader(args);
 
-    model = ConvNet(args);
+    model = CompressModel(args);
 
     trainer = ModelTrainer(model, dataloader, args);
 
@@ -18,12 +18,13 @@ def run():
         trainer.test();
     else:
         trainer.train();
-        print('done');
-        exit();
+        trainer.test();
+
 
 
 
 
 if __name__ == '__main__':
     run();
+    print('done');
     exit();

@@ -24,7 +24,7 @@ class ASCDataset(torch.utils.data.Dataset):
         self.audio_labels = [ClassDict.getId(name) for name in self.audio_labels];
 
         if(nsilence == -1):
-            nsilence = len(self.audio_files) // len(set(self.audio_labels));
+            nsilence = len(self.audio_files) // ClassDict.len();
 
         self.nsilence = nsilence;
         self.silence_label = ClassDict.len();
@@ -54,23 +54,20 @@ class ASCDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.audio_labels) + self.nsilence
 
-def get_transform(args):
-    # transform = transforms.Compose([transforms.Resize(opt.isize),
-    #                                 transforms.CenterCrop(opt.isize),
-    #                                 transforms.ToTensor(),
-    #                                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
 
-    def xxx(x):
-        print(x);
-        return x;
+def get_transform(args):
+
+    def debug(tensor):
+        print(tensor);
+        return tensor;
 
     test_trasform = transforms.Compose([
         # transforms.ToTensor(),
-        # Lambda(xxx),
+        # Lambda(debug),
         Lambda(lambda x: torch.from_numpy(x / 2**15).float()),
-        # Lambda(xxx),
+        # Lambda(debug),
         torchaudio.transforms.MFCC(n_mfcc=args.nmfcc),
-        # Lambda(xxx),
+        # Lambda(debug),
     ]);
 
     silence_transform = test_trasform;
@@ -86,6 +83,7 @@ def get_transform(args):
 
 
 def get_dataloader(args):
+    args.nclass = ClassDict.len() + 1;
     splits = ['train', 'val', 'test']
 
     transform, s_transform = get_transform(args);
@@ -93,7 +91,7 @@ def get_dataloader(args):
     dataset = utils.split(args.dataroot, args.pct_val, args.pct_test);
     # TODO: delete
     dataset = {split: [(x, dataset[split][x]) for x in dataset[split]] for split in splits};
-    dataset['train'] = dataset['train'][:]
+    dataset['train'] = dataset['train'][:args.debug]
 
 
     dataset = {split: ASCDataset(dataset[split], transform[split], s_transform, args.nsilence)
