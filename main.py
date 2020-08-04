@@ -15,15 +15,14 @@ def run():
 
     trainer = ModelTrainer(model, dataloader, args);
 
-    # if(args.test):
-    #     trainer.test();
-    # else:
-    #     trainer.train();
-
-    try:
-        trainer.train();
-    finally:
+    if(args.test):
         trainer.test();
+    else:
+        try:
+            trainer.train();
+        finally:
+            trainer.test();
+
 
 if __name__ == '__main__':
     run();
