@@ -1,8 +1,10 @@
 import torch
 import numpy as np
+import random
 
 from src.utils import *
 from python_speech_features import mfcc, logfbank
+from src.load import load_silence
 
 
 class Random_Transform(object):
@@ -45,12 +47,19 @@ class ToTensor(object):
 
 class TimeShift(object):
 
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
+    def __init__(self, sec_min=0.1, sec_max=0.3, amp_min=-10, amp_max=10):
+        self.sec_min = sec_min
+        self.sec_max = sec_max
+        self.amp_min = amp_min
+        self.amp_max = amp_max
 
     def __call__(self, signal):
-        return signal
+        sec = random.uniform(self.sec_min, self.sec_max)
+        num_pad = int(sec * len(signal))
+        padding = np.random.randint(self.amp_min, self.amp_max, num_pad, dtype=np.int16)
+        if random.choice([0, 1]) == 0:
+            return np.concatenate((padding, signal[:-num_pad]))
+        return np.concatenate((signal[num_pad:], padding))
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
