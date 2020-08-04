@@ -1,2 +1,5 @@
+pandas
+scipy
+numpy
 python_speech_features
 comet_ml
