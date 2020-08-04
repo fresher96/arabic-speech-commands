@@ -74,7 +74,7 @@ def split(args, validation_part=0.2, test_part=0.2):
     return {'train': training_files, 'val': validation_files, 'test': test_files}
 
 
-def split_to_csv(args, dataset_splits):
+def split_to_csv(dataset_splits):
     d = defaultdict(lambda: defaultdict(list))
     for set_name, set_data in dataset_splits.items():
         for file_path, class_name in set_data:
@@ -83,4 +83,4 @@ def split_to_csv(args, dataset_splits):
 
     for set_name, set_dict in d.items():
         data_frame = pd.DataFrame(set_dict)
-        data_frame.to_csv(set_name + '_' + args.features_name + '.csv', index=False)
+        data_frame.to_csv(set_name + '.csv', index=False)
