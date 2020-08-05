@@ -11,10 +11,12 @@ class LogisticRegression(nn.Module):
         self.name = self.__class__.__name__
 
         self.input_shape = args.nmfcc * args.nfilter
+        self.dropout = nn.Dropout(p=args.dropout);
         self.fc = nn.Linear(self.input_shape, args.nclass)
 
     def forward(self, x):
         x = x.view(-1, self.input_shape)
+        x = self.dropout(x);
         x = self.fc(x)
         return x
 
@@ -27,12 +29,13 @@ class CompressModel(nn.Module):
         self.name = self.__class__.__name__
 
         self.input_shape = args.nmfcc * args.nfilter
+        self.dropout = nn.Dropout(p=args.dropout);
         self.fc1 = nn.Linear(self.input_shape, 1)
         self.fc2 = nn.Linear(1, args.nclass)
 
     def forward(self, x):
         x = x.view(-1, self.input_shape)
-        x = F.dropout(x, p=0.0, training=self.training);
+        x = self.dropout(x);
         x = self.fc1(x)
         x = self.fc2(x)
         return x
@@ -48,7 +51,7 @@ class ConvNet(nn.Module):
         def block(in_filters, out_filters, bn):
             block = [nn.Conv2d(in_filters, out_filters, 3, bias=not bn),
                      nn.ReLU(0.2),
-                     nn.Dropout2d(0.25)]
+                     nn.Dropout2d(args.droupout)]
             if bn:
                 block.append(nn.BatchNorm2d(out_filters))
             return nn.Sequential(*block);
