@@ -40,20 +40,28 @@ class CompressModel(nn.Module):
 
 class ConvNet(nn.Module):
 
-    def __init__(self):
+    def __init__(self, args):
         super(ConvNet, self).__init__()
 
         self.name = self.__class__.__name__
 
-        self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
-        self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
-        self.conv2_drop = nn.Dropout2d()
+        def block(in_filters, out_filters, bn):
+            block = [nn.Conv2d(in_filters, out_filters, 3, bias=not bn), nn.LeakyReLU(0.2, inplace=True), nn.Dropout2d(0.25)]
+            if bn:
+                block.append(nn.BatchNorm2d(out_filters))
+            return block
+
+        self.conv = []
+        for i in range(args.nlayer):
+            self.conv += block(2 ** i, 2 ** (i+1), i != 0);
+
+        self.conv = nn.Sequential(self.conv)
+
+        self.fc = nn.Linear(2 ** args.nlayer, args.nclass);
 
     def forward(self, x):
-        x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        x = F.relu(F.max_pool2d(F.dropout(self.conv2(x), training=self.training), 2))
-        x = x.view(-1, 320)
-        x = F.relu(self.fc1(x))
-        x = F.dropout(x, training=self.training)
-        x = self.fc2(x)
-        return F.log_softmax(x)
+        x = self.conv(x)
+        x = x.view(x.size(0), x.size(1), -1)  # shape: (batch, feats, o3)
+        x = torch.mean(x, 2)
+        x = self.fc(x)
+        return x

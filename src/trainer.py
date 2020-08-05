@@ -32,7 +32,7 @@ class ModelTrainer():
 
         if(args.scheduler == 'set'):
             self.scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lambda epoch: 10**(epoch/20))
-        else:
+        elif(args.scheduler == 'auto'):
             self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.1, patience=5,
                                                                   verbose=True, threshold=0.0001, threshold_mode='rel',
                                                                   cooldown=0, min_lr=0, eps=1e-08);
@@ -114,7 +114,7 @@ class ModelTrainer():
             if(self.args.scheduler == 'set'):
                 self.scheduler.step(epoch);
                 print('learning rate changed to: %.10f'% self.optimizer.param_groups[0]['lr'])
-            else:
+            elif(self.args.scheduler == 'auto'):
                 self.scheduler.step(res['loss']);
 
         print(">> Training model %s.[Done]" % self.model.name)

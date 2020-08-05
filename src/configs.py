@@ -16,15 +16,15 @@ def set_defaults():
     parser.add_argument('--nsilence', type=int, default=0, help='')
 
     # training configs
-    parser.add_argument('--model', type=str, default='CompressModel', help='')
+    parser.add_argument('--model', type=str, default='ConvNet', help='')
     parser.add_argument('--nepoch', type=int, default=3, help='number of epochs to train for')
     parser.add_argument('--batchsize', type=int, default=32, help='input batch size')
     parser.add_argument('--metric', type=str, default='acc', help='')
-    parser.add_argument('--lr', type=float, default=1e-6, help='learning rate')
+    parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
     parser.add_argument('--momentum', type=int, default=0.9, help='')
     parser.add_argument('--beta1', type=float, default=0.9, help='')
     parser.add_argument('--optimizer', type=str, default='adam', help='adam | sgd')
-    parser.add_argument('--scheduler', type=str, default='set', help='auto | set')
+    parser.add_argument('--scheduler', type=str, default='set', help='auto | set | none')
 
     # data files configs
     parser.add_argument('--data_root', default='.', help='path to dataset')
@@ -44,6 +44,10 @@ def set_defaults():
     parser.add_argument('--comet_key', type=str, default='bLjz3xx3gKDZwM7Hm0Kcgbpww', help='');
     parser.add_argument('--comet_project', type=str, default='arabic-commands', help='');
     parser.add_argument('--comet_workspace', type=str, default='fresher96', help='');
+
+    # model architicture
+    parser.add_argument('--nlayer', type=int, default=7);
+
 
     return parser.parse_args();
 
