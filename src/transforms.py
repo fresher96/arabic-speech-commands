@@ -45,7 +45,26 @@ class ToTensor(object):
         return self.__class__.__name__ + '()'
 
 
-class TimeShift(object):
+class AddNoise(object):
+
+    def __init__(self, noise_files, noise_probability_distribution, volume_rate, signal_samples, data_root, signal_sr):
+        self.noise_files = noise_files
+        self.noise_probability_distribution = noise_probability_distribution
+        self.volume_rate = volume_rate
+        self.signal_samples = signal_samples
+        self.data_root = data_root
+        self.signal_sr = signal_sr
+
+    def __call__(self, signal):
+        bkg_noise = load_silence(self.noise_files, self.noise_probability_distribution,
+                                 self.signal_samples, self.data_root, self.signal_sr)
+        return signal + np.array(bkg_noise * self.volume_rate, dtype=np.int16)
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
+
+
+class TimeShifting(object):
 
     def __init__(self, sec_min=0.1, sec_max=0.3, amp_min=-10, amp_max=10):
         self.sec_min = sec_min
