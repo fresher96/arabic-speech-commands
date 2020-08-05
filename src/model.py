@@ -46,16 +46,16 @@ class ConvNet(nn.Module):
         self.name = self.__class__.__name__
 
         def block(in_filters, out_filters, bn):
-            block = [nn.Conv2d(in_filters, out_filters, 3, bias=not bn), nn.LeakyReLU(0.2, inplace=True), nn.Dropout2d(0.25)]
+            block = [nn.Conv2d(in_filters, out_filters, 3, bias=not bn),
+                     nn.ReLU(0.2),
+                     nn.Dropout2d(0.25)]
             if bn:
                 block.append(nn.BatchNorm2d(out_filters))
-            return block
+            return nn.Sequential(*block);
 
-        self.conv = []
+        self.conv = nn.Sequential();
         for i in range(args.nlayer):
-            self.conv += block(2 ** i, 2 ** (i+1), i != 0);
-
-        self.conv = nn.Sequential(self.conv)
+            self.conv.add_module('conv_%d'%i, block(2**i, 2**(i+1), i != 0));
 
         self.fc = nn.Linear(2 ** args.nlayer, args.nclass);
 

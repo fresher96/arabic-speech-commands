@@ -68,6 +68,7 @@ def get_transform(args):
         Lambda(lambda x: torch.from_numpy(x / 2**15).float()),
         # Lambda(debug),
         torchaudio.transforms.MFCC(n_mfcc=args.nmfcc),
+        Lambda(lambda x: x.unsqueeze(0)),
         # Lambda(debug),
     ]);
 

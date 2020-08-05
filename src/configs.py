@@ -11,13 +11,13 @@ def set_defaults():
     # audio data configs
     parser.add_argument('--signal_sr', type=int, default=16000, help='')
     parser.add_argument('--signal_len', type=float, default=1, help='')
-    parser.add_argument('--nmfcc', type=int, default=13, help='')
+    parser.add_argument('--nmfcc', type=int, default=40, help='')
     parser.add_argument('--nfilter', type=int, default=81, help='')
     parser.add_argument('--nsilence', type=int, default=0, help='')
 
     # training configs
     parser.add_argument('--model', type=str, default='ConvNet', help='')
-    parser.add_argument('--nepoch', type=int, default=3, help='number of epochs to train for')
+    parser.add_argument('--nepoch', type=int, default=10, help='number of epochs to train for')
     parser.add_argument('--batchsize', type=int, default=32, help='input batch size')
     parser.add_argument('--metric', type=str, default='acc', help='')
     parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
