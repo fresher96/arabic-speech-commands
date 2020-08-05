@@ -10,11 +10,12 @@ class LogisticRegression(nn.Module):
 
         self.name = self.__class__.__name__
 
-        self.input_shape = args.nmfcc * args.nfilter
+        self.input_shape = args.nfeature * args.signal_width
         self.dropout = nn.Dropout(p=args.dropout);
         self.fc = nn.Linear(self.input_shape, args.nclass)
 
     def forward(self, x):
+        print(x.size());
         x = x.view(-1, self.input_shape)
         x = self.dropout(x);
         x = self.fc(x)
@@ -28,7 +29,7 @@ class CompressModel(nn.Module):
 
         self.name = self.__class__.__name__
 
-        self.input_shape = args.nmfcc * args.nfilter
+        self.input_shape = args.nfeature * args.signal_width
         self.dropout = nn.Dropout(p=args.dropout);
         self.fc1 = nn.Linear(self.input_shape, 1)
         self.fc2 = nn.Linear(1, args.nclass)

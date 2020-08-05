@@ -36,6 +36,22 @@ class Compose(object):
         format_string += '\n)'
         return format_string
 
+class Lambda(object):
+    """Apply a user-defined lambda as a transform.
+
+    Args:
+        lambd (function): Lambda/function to be used for transform.
+    """
+
+    def __init__(self, lambd):
+        assert callable(lambd), repr(type(lambd).__name__) + " object is not callable"
+        self.lambd = lambd
+
+    def __call__(self, img):
+        return self.lambd(img)
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
 
 class ToTensor(object):
 
@@ -115,11 +131,18 @@ class TimeScaling(object):
 
 class LogFBEs(object):
 
-    def __init__(self, n_filters):
-        self.n_filters = n_filters
+    def __init__(self, samplerate, winlen, winstep, nfilt, nfft, preemph):
+        self.samplerate = samplerate;
+        self.winlen = winlen;
+        self.winstep = winstep;
+        self.nfilt = nfilt;
+        self.nfft = nfft;
+        self.preemph = preemph;
 
     def __call__(self, signal):
-        features = logfbank(signal, nfilt=self.n_filters)
+        features = logfbank(signal, samplerate=self.samplerate, winlen=self.winlen,
+                        winstep=self.winstep, nfilt=self.nfilt, nfft=self.nfft,
+                        preemph=self.preemph)
         return features
 
     def __repr__(self):
@@ -128,11 +151,20 @@ class LogFBEs(object):
 
 class MFCCs(object):
 
-    def __init__(self, n_filters):
-        self.n_filters = n_filters
+    def __init__(self, samplerate, winlen, winstep, numcep, nfilt, nfft, preemph, ceplifter):
+        self.samplerate = samplerate;
+        self.winlen = winlen;
+        self.winstep = winstep;
+        self.numcep = numcep,
+        self.nfilt = nfilt;
+        self.nfft = nfft;
+        self.preemph = preemph;
+        self.ceplifter = ceplifter;
 
     def __call__(self, signal):
-        features = mfcc(signal, nfilt=self.n_filters)
+        features = mfcc(signal, samplerate=self.samplerate, winlen=self.winlen,
+                        winstep=self.winstep, numcep=self.numcep, nfilt=self.nfilt, nfft=self.nfft,
+                        preemph=self.preemph, ceplifter=self.ceplifter)
         return features
 
     def __repr__(self):

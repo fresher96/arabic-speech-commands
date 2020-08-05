@@ -8,16 +8,19 @@ import torchaudio
 from src import utils;
 from src import transforms;
 from src.ClassDict import ClassDict;
+from src import load;
 
 
 class ASCDataset(torch.utils.data.Dataset):
 
-    def __init__(self, data_root, dataset, transform, s_transform, nsilence):
+    def __init__(self, data_root, dataset, transform, s_transform, nsilence, signal_samples, signal_sr, noise_pkg):
         super().__init__()
 
         self.transform = transform;
         self.s_transform = s_transform;
         self.data_root = data_root;
+        self.signal_samples = signal_samples;
+        self.signal_sr = signal_sr;
 
         dataset = list(zip(*dataset))
         self.audio_files = list(dataset[0])
@@ -30,19 +33,22 @@ class ASCDataset(torch.utils.data.Dataset):
         self.nsilence = nsilence;
         self.silence_label = ClassDict.len();
 
+        self.nfl, self.npd = utils.get_noise_files(noise_pkg, signal_sr);
+
     def load_silence(self):
-        # TODO
-        signal = np.random.randn(16000);
+        signal = load.load_silence(self.nfl, self.npd, self.signal_samples, self.data_root, self.signal_sr);
         tensor = self.s_transform(signal);
         return tensor;
 
-    def load_audio(self, path):
-        # TODO
-        # len = 16000;
-        # signal = np.random.randn(len);
-        path = os.path.join(self.data_root, path);
-        (_, signal) = wavfile.read(path);
+    def load_audio(self, idx):
+        # signal = load.load_data(self.audio_labels[idx], self.audio_files[idx], self.signal_samples, self.data_root,
+        #                         self.signal_sr, check_length=True)
+        #
+        # tensor = self.transform(signal);
+        # return tensor;
 
+        file_path = os.path.join(self.data_root, self.audio_files[idx]);
+        sampling_rate, signal = wavfile.read(file_path)
         tensor = self.transform(signal);
         return tensor;
 
@@ -50,7 +56,7 @@ class ASCDataset(torch.utils.data.Dataset):
         if index >= len(self.audio_labels):
             return self.load_silence(), self.silence_label
         else:
-            return self.load_audio(self.audio_files[index]), self.audio_labels[index]
+            return self.load_audio(index), self.audio_labels[index]
 
     def __len__(self):
         return len(self.audio_labels) + self.nsilence
@@ -62,17 +68,39 @@ def get_transform(args):
         print(tensor);
         return tensor;
 
+    args.signal_width = 99; #TODO
+    if(args.features_name.lower() == 'logfbes'):
+        features = transforms.LogFBEs(args.signal_sr, args.winlen, args.winstep, args.nfilt,
+                                    args.nfft, args.preemph);
+        args.nfeature = args.nfilt
+    elif(args.features_name.lower() == 'mfccs'):
+        features = transforms.MFCCs(args.signal_sr, args.winlen, args.winstep, args.numcep, args.nfilt,
+                                    args.nfft, args.preemph, args.ceplifter);
+        args.nfeature = args.numcep
+    else:
+        raise Exception('--features_name should be one of {LogFBEs | MFCCs}');
+
+
     test_trasform = transforms.Compose([
-        Lambda(lambda x: torch.from_numpy(x / 2**15).float()),
-        torchaudio.transforms.MFCC(n_mfcc=args.nmfcc),
-        Lambda(lambda x: x.unsqueeze(0)),
+        features,
+        transforms.ToTensor(),
+        transforms.Lambda(lambda x: x.unsqueeze(0)),
     ]);
 
     silence_transform = test_trasform;
 
+
+    args.signal_samples = args.signal_sr * args.signal_len;
+    args.bkg_noise_path = 'background_noise';
+
+    noise_files, noise_probability_distribution = utils.get_noise_files(
+        os.path.join(args.data_root, args.bkg_noise_path), signal_sr=args.signal_sr);
+
     train_transform = transforms.Compose([
-        # transforms.TimeShift(args.left_shift, args.right_shift),
-        # transforms.ToTensor(),
+        transforms.TimeScaling(scale_min=args.scale_min, scale_max=args.scale_max, amp_min=0, amp_max=1),  #TODO
+        transforms.TimeShifting(sec_min=args.shift_min, sec_max=args.shift_max, amp_min=0, amp_max=1),  #TODO
+        transforms.AddNoise(noise_files, noise_probability_distribution, args.noise_vol,
+                            args.signal_samples, args.data_root, args.signal_sr),  #TODO
         test_trasform,
     ]);
 
@@ -86,12 +114,13 @@ def get_dataloader(args):
 
     transform, s_transform = get_transform(args);
 
-    dataset = utils.split(args, args.pct_val, args.pct_test);
+    dataset = utils.split(args, args.pct_val, args.pct_test); #TODO
 
     if(args.debug != -1):
         dataset = {split: dataset[split][:args.debug] for split in splits}
 
-    dataset = {split: ASCDataset(args.data_root, dataset[split], transform[split], s_transform, args.nsilence)
+    dataset = {split: ASCDataset(args.data_root, dataset[split], transform[split], s_transform, args.nsilence,
+                                 args.signal_samples, args.signal_sr, os.path.join(args.data_root, args.bkg_noise_path))
                for split in splits}
 
     dataloader = {split: torch.utils.data.DataLoader(dataset=dataset[split],
@@ -101,21 +130,4 @@ def get_dataloader(args):
 
     return dataloader
 
-
-class Lambda(object):
-    """Apply a user-defined lambda as a transform.
-
-    Args:
-        lambd (function): Lambda/function to be used for transform.
-    """
-
-    def __init__(self, lambd):
-        assert callable(lambd), repr(type(lambd).__name__) + " object is not callable"
-        self.lambd = lambd
-
-    def __call__(self, img):
-        return self.lambd(img)
-
-    def __repr__(self):
-        return self.__class__.__name__ + '()'
 

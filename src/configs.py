@@ -21,9 +21,24 @@ def set_defaults():
     # audio data configs
     parser.add_argument('--signal_sr', type=int, default=16000, help='')
     parser.add_argument('--signal_len', type=float, default=1, help='')
-    parser.add_argument('--nmfcc', type=int, default=40, help='')
-    parser.add_argument('--nfilter', type=int, default=81, help='')
     parser.add_argument('--nsilence', type=int, default=-1, help='')
+
+    # augmentations LogFBEs | MFCCs
+    parser.add_argument('--features_name', type=str, default='LogFBEs', help='LogFBEs | MFCCs')
+    parser.add_argument('--nfilt', type=int, default=40, help='')
+    parser.add_argument('--winlen', type=float, default=0.025, help='')
+    parser.add_argument('--winstep', type=float, default=0.010, help='')
+    parser.add_argument('--nfft', type=int, default=512, help='')
+    parser.add_argument('--preemph', type=float, default=0.97, help='')
+    parser.add_argument('--ceplifter', type=int, default=22, help='')
+    parser.add_argument('--numcep', type=float, default=13, help='')
+
+    # augmentations
+    parser.add_argument('--scale_min', type=float, default=0.0)
+    parser.add_argument('--scale_max', type=float, default=0.3, help='')
+    parser.add_argument('--shift_min', type=float, default=0.0, help='')
+    parser.add_argument('--shift_max', type=float, default=0.2, help='')
+    parser.add_argument('--noise_vol', type=float, default=0.5, help='')
 
     # experiment configs
     parser.add_argument('--name', type=str, default='untitled', help='name of the experiment')
@@ -46,7 +61,7 @@ def set_defaults():
     parser.add_argument('--scheduler', type=str, default='none', help='auto | set | none')
 
     # model architecture
-    parser.add_argument('--model', type=str, default='LogisticRegression',
+    parser.add_argument('--model', type=str, default='ResNet',
                         help='LogisticRegression | CompressModel | ConvNet | ResNet');
     parser.add_argument('--dropout', type=float, default=0.5);
     parser.add_argument('--nlayer', type=int, default=8);
