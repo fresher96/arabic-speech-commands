@@ -59,7 +59,8 @@ class AddNoise(object):
     def __call__(self, signal):
         bkg_noise = load_silence(self.noise_files, self.noise_probability_distribution,
                                  self.signal_samples, self.data_root, self.signal_sr)
-        return signal + np.array(bkg_noise * self.volume_rate, dtype=np.int16)
+        bkg_noise_volume = random.uniform(0.01, self.volume_rate)
+        return signal + np.array(bkg_noise * bkg_noise_volume, dtype=np.int16)
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
