@@ -16,7 +16,7 @@ def set_defaults():
     parser.add_argument('--nsilence', type=int, default=-1, help='')
 
     # training configs
-    parser.add_argument('--model', type=str, default='vanilla', help='')
+    parser.add_argument('--model', type=str, default='CompressModel', help='')
     parser.add_argument('--nepoch', type=int, default=3, help='number of epochs to train for')
     parser.add_argument('--batchsize', type=int, default=64, help='input batch size')
     parser.add_argument('--metric', type=str, default='acc', help='')
