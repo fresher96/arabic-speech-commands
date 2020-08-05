@@ -35,7 +35,7 @@ def set_defaults():
     parser.add_argument('--weights_path', type=str, default=None, help='')
 
     # training configs
-    parser.add_argument('--weight_decay', type=int, default=1e-5, help='number of epochs to train for')
+    parser.add_argument('--weight_decay', type=float, default=1e-5)
     parser.add_argument('--nepoch', type=int, default=2, help='number of epochs to train for')
     parser.add_argument('--batchsize', type=int, default=32, help='input batch size')
     parser.add_argument('--metric', type=str, default='acc', help='')
@@ -46,7 +46,8 @@ def set_defaults():
     parser.add_argument('--scheduler', type=str, default='none', help='auto | set | none')
 
     # model architecture
-    parser.add_argument('--model', type=str, default='ResNet');
+    parser.add_argument('--model', type=str, default='LogisticRegression',
+                        help='LogisticRegression | CompressModel | ConvNet | ResNet');
     parser.add_argument('--dropout', type=float, default=0.5);
     parser.add_argument('--nlayer', type=int, default=8);
     parser.add_argument('--nchannel', type=int, default=19);
