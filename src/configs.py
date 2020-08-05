@@ -20,7 +20,7 @@ def set_defaults():
     parser.add_argument('--nepoch', type=int, default=3, help='number of epochs to train for')
     parser.add_argument('--batchsize', type=int, default=64, help='input batch size')
     parser.add_argument('--metric', type=str, default='acc', help='')
-    parser.add_argument('--lr', type=float, default=0.00002, help='learning rate')
+    parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
     parser.add_argument('--momentum', type=int, default=0.9, help='')
     parser.add_argument('--beta1', type=float, default=0.9, help='')
     parser.add_argument('--optimizer', type=str, default='adam', help='adam | sgd')
