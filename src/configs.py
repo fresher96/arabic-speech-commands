@@ -13,18 +13,18 @@ def set_defaults():
     parser.add_argument('--signal_len', type=float, default=1, help='')
     parser.add_argument('--nmfcc', type=int, default=13, help='')
     parser.add_argument('--nfilter', type=int, default=81, help='')
-    parser.add_argument('--nsilence', type=int, default=-1, help='')
+    parser.add_argument('--nsilence', type=int, default=0, help='')
 
     # training configs
     parser.add_argument('--model', type=str, default='CompressModel', help='')
     parser.add_argument('--nepoch', type=int, default=3, help='number of epochs to train for')
-    parser.add_argument('--batchsize', type=int, default=64, help='input batch size')
+    parser.add_argument('--batchsize', type=int, default=32, help='input batch size')
     parser.add_argument('--metric', type=str, default='acc', help='')
-    parser.add_argument('--lr', type=float, default=1e-8, help='learning rate')
+    parser.add_argument('--lr', type=float, default=1e-6, help='learning rate')
     parser.add_argument('--momentum', type=int, default=0.9, help='')
     parser.add_argument('--beta1', type=float, default=0.9, help='')
     parser.add_argument('--optimizer', type=str, default='adam', help='adam | sgd')
-    parser.add_argument('--scheduler', type=str, default='auto', help='auto | set')
+    parser.add_argument('--scheduler', type=str, default='set', help='auto | set')
 
     # data files configs
     parser.add_argument('--data_root', default='.', help='path to dataset')
@@ -35,8 +35,8 @@ def set_defaults():
     parser.add_argument('--name', type=str, default='untitled', help='name of the experiment')
     parser.add_argument('--outf', default='./output', help='folder to output images and model checkpoints')
     parser.add_argument('--seed', default=-1, type=int, help='manual seed')
-    parser.add_argument('--frq_log', type=int, default=25, help='frequency of showing training results on console')
-    parser.add_argument('--debug', type=int, default=-1, help='')
+    parser.add_argument('--frq_log', type=int, default=2, help='frequency of showing training results on console')
+    parser.add_argument('--debug', type=int, default=32 * 4, help='')
     parser.add_argument('--test', action='store_true', default=False, help='load weights and run on test set')
     parser.add_argument('--weights_path', type=str, default=None, help='')
 

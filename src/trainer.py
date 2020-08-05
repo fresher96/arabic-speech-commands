@@ -31,7 +31,7 @@ class ModelTrainer():
             raise Exception('--optimizer should be one of {sgd, adam}');
 
         if(args.scheduler == 'set'):
-            self.scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lambda epoch: 10**(1 / 20))
+            self.scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lambda epoch: 10**(epoch/20))
         else:
             self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.1, patience=5,
                                                                   verbose=True, threshold=0.0001, threshold_mode='rel',
@@ -111,7 +111,11 @@ class ModelTrainer():
                 best = res[self.metric]
                 self.save_weights(epoch)
 
-            self.scheduler.step(res['loss']) if self.args.scheduler == 'set' else self.scheduler.step();
+            if(self.args.scheduler == 'set'):
+                self.scheduler.step(epoch);
+                print('learning rate changed to: %.10f'% self.optimizer.param_groups[0]['lr'])
+            else:
+                self.scheduler.step(res['loss']);
 
         print(">> Training model %s.[Done]" % self.model.name)
 
