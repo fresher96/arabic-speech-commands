@@ -1,5 +1,7 @@
 import os
 from math import ceil
+import numpy as np
+from scipy.io import wavfile
 from collections import defaultdict
 import pandas as pd
 
@@ -19,6 +21,25 @@ def get_dataset_files(dataset_path):
                 class_name = os.path.basename(dir_path)
                 dataset_files[class_name].append(file_name)
     return dataset_files
+
+
+# Create a list that contains all background noise files and their probability_distribution
+def get_noise_files(bkg_noise_path, signal_sr=16000):
+    files_list = list()
+    for file_name in os.listdir(bkg_noise_path):
+        if is_wav_file(file_name):
+            files_list.append(file_name)
+    signals_length = list()
+    for file_name in files_list:
+        file_path = os.path.join(bkg_noise_path, file_name)
+        sampling_rate, signal = wavfile.read(file_path)
+        file_dir = os.path.join('background_noise', file_name)
+        # Ensure that the sampling rate of the current file is correct
+        assert sampling_rate == signal_sr, '{}'.format(file_dir)
+        signals_length.append(signal.shape[0])
+    signals_length = np.array(signals_length)
+    probability_distribution = signals_length / signals_length.sum()
+    return files_list,  probability_distribution
 
 
 # Group the list of files by person
@@ -53,7 +74,7 @@ def split(args, validation_part=0.2, test_part=0.2):
     return {'train': training_files, 'val': validation_files, 'test': test_files}
 
 
-def split_to_csv(args, dataset_splits):
+def split_to_csv(dataset_splits):
     d = defaultdict(lambda: defaultdict(list))
     for set_name, set_data in dataset_splits.items():
         for file_path, class_name in set_data:
@@ -62,4 +83,4 @@ def split_to_csv(args, dataset_splits):
 
     for set_name, set_dict in d.items():
         data_frame = pd.DataFrame(set_dict)
-        data_frame.to_csv(set_name + '_' + args.features_name + '.csv', index=False)
+        data_frame.to_csv(set_name + '.csv', index=False)
