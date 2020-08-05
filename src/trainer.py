@@ -24,9 +24,9 @@ class ModelTrainer():
         model.to(self.device);
 
         if(args.optimizer == 'sgd'):
-            self.optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum);
+            self.optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay);
         elif(args.optimizer == 'adam'):
-            self.optimizer = optim.Adam(model.parameters(), lr=args.lr, betas=(args.beta1, 0.999), weight_decay=1);
+            self.optimizer = optim.Adam(model.parameters(), lr=args.lr, betas=(args.beta1, 0.999), weight_decay=args.weight_decay);
         else:
             raise Exception('--optimizer should be one of {sgd, adam}');
 
