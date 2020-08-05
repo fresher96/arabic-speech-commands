@@ -24,6 +24,7 @@ def set_defaults():
     parser.add_argument('--momentum', type=int, default=0.9, help='')
     parser.add_argument('--beta1', type=float, default=0.9, help='')
     parser.add_argument('--optimizer', type=str, default='adam', help='adam | sgd')
+    parser.add_argument('--scheduler', type=str, default='auto', help='auto | set')
 
     # data files configs
     parser.add_argument('--data_root', default='.', help='path to dataset')
