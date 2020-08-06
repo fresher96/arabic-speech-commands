@@ -41,7 +41,8 @@ class ASCDataset(torch.utils.data.Dataset):
         return tensor
 
     def load_audio(self, idx):
-        file_path = os.path.join(self.data_root, self.audio_files[idx])
+        file_path = os.path.join(self.data_root, *self.audio_files[idx].split('\\'))
+        # file_path = load.load_data(self.class_name, file_name, signal_samples, self.data_root, signal_sr)
         sampling_rate, signal = wavfile.read(file_path)
         tensor = self.transform(signal)
         return tensor
