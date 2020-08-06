@@ -14,7 +14,7 @@ def set_defaults():
     parser.add_argument('--comet_workspace', type=str, default='');
 
     # data files configs
-    parser.add_argument('--data_root', default='.', help='path to dataset')
+    parser.add_argument('--data_root', type=str, default='.', help='path to dataset')
     parser.add_argument('--pct_val', type=float, default=0.20, help='')
     parser.add_argument('--pct_test', type=float, default=0.20, help='')
 
@@ -31,7 +31,7 @@ def set_defaults():
     parser.add_argument('--nfft', type=int, default=512, help='')
     parser.add_argument('--preemph', type=float, default=0.97, help='')
     parser.add_argument('--ceplifter', type=int, default=22, help='')
-    parser.add_argument('--numcep', type=float, default=13, help='')
+    parser.add_argument('--numcep', type=int, default=13, help='')
 
     # augmentations
     parser.add_argument('--scale_min', type=float, default=0.0)
@@ -42,7 +42,7 @@ def set_defaults():
 
     # experiment configs
     parser.add_argument('--name', type=str, default='untitled', help='name of the experiment')
-    parser.add_argument('--outf', default='./output', help='folder to output images and model checkpoints')
+    parser.add_argument('--outf', type=str, default='./output', help='folder to output images and model checkpoints')
     parser.add_argument('--seed', default=-1, type=int, help='manual seed')
     parser.add_argument('--frq_log', type=int, default=2, help='frequency of showing training results on console')
     parser.add_argument('--debug', type=int, default=32 * 4, help='')
@@ -55,7 +55,7 @@ def set_defaults():
     parser.add_argument('--batchsize', type=int, default=32, help='input batch size')
     parser.add_argument('--metric', type=str, default='acc', help='')
     parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
-    parser.add_argument('--momentum', type=int, default=0.9, help='')
+    parser.add_argument('--momentum', type=float, default=0.9, help='')
     parser.add_argument('--beta1', type=float, default=0.9, help='')
     parser.add_argument('--optimizer', type=str, default='sgd', help='adam | sgd')
     parser.add_argument('--scheduler', type=str, default='none', help='auto | set | none')
