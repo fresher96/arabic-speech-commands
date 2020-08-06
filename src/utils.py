@@ -84,3 +84,13 @@ def split_to_csv(dataset_splits):
     for set_name, set_dict in d.items():
         data_frame = pd.DataFrame(set_dict)
         data_frame.to_csv(set_name + '.csv', index=False)
+
+
+def read_splits(data_root):
+    train_rows = pd.read_csv(os.path.join(data_root, 'train.csv')).to_numpy()
+    train_list = [(row[0], row[1]) for row in train_rows]
+    val_rows = pd.read_csv(os.path.join(data_root, 'val.csv')).to_numpy()
+    val_list = [(row[0], row[1]) for row in val_rows]
+    test_rows = pd.read_csv(os.path.join(data_root, 'test.csv')).to_numpy()
+    test_list = [(row[0], row[1]) for row in test_rows]
+    return {'train': train_list, 'val': val_list, 'test': test_list}
