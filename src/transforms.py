@@ -86,7 +86,7 @@ class AddNoise(object):
 
 class TimeShifting(object):
 
-    def __init__(self, shift_min=-0.3, shift_max=0.3):
+    def __init__(self, shift_min, shift_max):
         self.shift_min = shift_min
         self.shift_max = shift_max
 
@@ -106,22 +106,19 @@ class TimeShifting(object):
 
 class TimeScaling(object):
 
-    def __init__(self, scale_min=0.1, scale_max=0.2, amp_min=-10, amp_max=10):
+    def __init__(self, scale_min, scale_max):
         self.scale_min = scale_min
         self.scale_max = scale_max
-        self.amp_min = amp_min
-        self.amp_max = amp_max
 
     def __call__(self, signal):
-        stretch = random.uniform(self.scale_min, self.scale_max)
-        rate = 1 + random.choice([-1, 1]) * stretch
+        rate = random.uniform(self.scale_min, self.scale_max)
         signal = (signal / (2 ** 15)).astype(np.float32)
         stretched_signal = time_stretch(signal, rate)
         stretched_signal = (stretched_signal * (2 ** 15)).astype(np.int16)
         new_length = len(stretched_signal)
 
         if new_length < len(signal):
-            padding = np.random.randint(self.amp_min, self.amp_max, len(signal) - new_length, dtype=np.int16)
+            padding = np.zeros(len(signal) - new_length, dtype=np.int16)
             index = np.random.randint(0, len(padding) + 1)
             return np.concatenate((padding[:index], stretched_signal, padding[index:]))
         index = np.random.randint(0, new_length - len(signal) + 1)

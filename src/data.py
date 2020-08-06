@@ -36,7 +36,7 @@ class ASCDataset(torch.utils.data.Dataset):
         self.nfl, self.npd = utils.get_noise_files(noise_pkg, signal_sr)
 
     def load_silence(self):
-        signal = load.load_silence(self.nfl, self.npd, self.signal_samples, self.data_root, self.signal_sr);
+        signal = load.load_silence(self.nfl, self.npd, self.signal_samples, self.data_root, self.signal_sr)
         tensor = self.s_transform(signal)
         return tensor
 
@@ -92,17 +92,17 @@ def get_transform(args):
     args.bkg_noise_path = 'background_noise'
 
     noise_files, noise_probability_distribution = utils.get_noise_files(
-        os.path.join(args.data_root, args.bkg_noise_path), signal_sr=args.signal_sr);
+        os.path.join(args.data_root, args.bkg_noise_path), signal_sr=args.signal_sr)
 
     train_transform = transforms.Compose([
-        transforms.TimeScaling(scale_min=args.scale_min, scale_max=args.scale_max, amp_min=0, amp_max=1),  #TODO
+        transforms.TimeScaling(scale_min=args.scale_min, scale_max=args.scale_max),
         transforms.TimeShifting(shift_min=args.shift_min, shift_max=args.shift_max),
         transforms.AddNoise(noise_files, noise_probability_distribution, args.noise_vol,
                             args.signal_samples, args.data_root, args.signal_sr),
         test_trasform,
     ])
 
-    return {'train': train_transform, 'val': test_trasform, 'test': test_trasform}, silence_transform;
+    return {'train': train_transform, 'val': test_trasform, 'test': test_trasform}, silence_transform
 
 
 def get_dataloader(args):

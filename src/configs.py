@@ -34,8 +34,8 @@ def set_defaults():
     parser.add_argument('--numcep', type=int, default=13, help='')
 
     # augmentations
-    parser.add_argument('--scale_min', type=float, default=0.0)
-    parser.add_argument('--scale_max', type=float, default=0.3, help='')
+    parser.add_argument('--scale_min', type=float, default=0.8, help='')
+    parser.add_argument('--scale_max', type=float, default=1.2, help='')
     parser.add_argument('--shift_min', type=float, default=-0.3, help='')
     parser.add_argument('--shift_max', type=float, default=0.3, help='')
     parser.add_argument('--noise_vol', type=float, default=0.5, help='')
@@ -76,7 +76,8 @@ def get_args():
     args = set_defaults()
 
     expr_dir = os.path.join(args.outf, args.name)
-    if not os.path.isdir(expr_dir): os.makedirs(expr_dir)
+    if not os.path.isdir(expr_dir):
+        os.makedirs(expr_dir)
 
     if args.seed != -1:
         print('using manual seed: {}'.format(args.seed))
