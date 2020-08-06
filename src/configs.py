@@ -9,9 +9,9 @@ def set_defaults():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     # comet_ml configs
-    parser.add_argument('--comet_key', type=str, default='');
-    parser.add_argument('--comet_project', type=str, default='');
-    parser.add_argument('--comet_workspace', type=str, default='');
+    parser.add_argument('--comet_key', type=str, default='')
+    parser.add_argument('--comet_project', type=str, default='')
+    parser.add_argument('--comet_workspace', type=str, default='')
 
     # data files configs
     parser.add_argument('--data_root', type=str, default='.', help='path to dataset')
@@ -36,8 +36,8 @@ def set_defaults():
     # augmentations
     parser.add_argument('--scale_min', type=float, default=0.0)
     parser.add_argument('--scale_max', type=float, default=0.3, help='')
-    parser.add_argument('--shift_min', type=float, default=0.0, help='')
-    parser.add_argument('--shift_max', type=float, default=0.2, help='')
+    parser.add_argument('--shift_min', type=float, default=-0.3, help='')
+    parser.add_argument('--shift_max', type=float, default=0.3, help='')
     parser.add_argument('--noise_vol', type=float, default=0.5, help='')
 
     # experiment configs
@@ -63,24 +63,23 @@ def set_defaults():
     # model architecture
     parser.add_argument('--model', type=str, default='ResNet',
                         help='LogisticRegression | CompressModel | ConvNet | ResNet');
-    parser.add_argument('--dropout', type=float, default=0.5);
-    parser.add_argument('--nlayer', type=int, default=8);
-    parser.add_argument('--nchannel', type=int, default=19);
-    parser.add_argument('--res_pool', type=tuple, default=(1, 1));
-    parser.add_argument('--use_dilation', action='store_true', default=False);
+    parser.add_argument('--dropout', type=float, default=0.5)
+    parser.add_argument('--nlayer', type=int, default=8)
+    parser.add_argument('--nchannel', type=int, default=19)
+    parser.add_argument('--res_pool', type=tuple, default=(1, 1))
+    parser.add_argument('--use_dilation', action='store_true', default=False)
 
-
-    return parser.parse_args();
+    return parser.parse_args()
 
 
 def get_args():
-    args = set_defaults();
+    args = set_defaults()
 
     expr_dir = os.path.join(args.outf, args.name)
     if not os.path.isdir(expr_dir): os.makedirs(expr_dir)
 
     if args.seed != -1:
-        print('using manual seed: {}'.format(args.seed));
+        print('using manual seed: {}'.format(args.seed))
         random.seed(args.seed)
         np.random.seed(args.seed)
         torch.manual_seed(args.seed)

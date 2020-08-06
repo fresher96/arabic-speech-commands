@@ -1,14 +1,14 @@
 import torch
-import numpy as np;
-import os;
-from scipy.io import wavfile;
+import numpy as np
+import os
+from scipy.io import wavfile
 import torchaudio
 
 
-from src import utils;
-from src import transforms;
-from src.ClassDict import ClassDict;
-from src import load;
+from src import utils
+from src import transforms
+from src.ClassDict import ClassDict
+from src import load
 
 
 class ASCDataset(torch.utils.data.Dataset):
@@ -16,29 +16,29 @@ class ASCDataset(torch.utils.data.Dataset):
     def __init__(self, data_root, dataset, transform, s_transform, nsilence, signal_samples, signal_sr, noise_pkg):
         super().__init__()
 
-        self.transform = transform;
-        self.s_transform = s_transform;
-        self.data_root = data_root;
-        self.signal_samples = signal_samples;
-        self.signal_sr = signal_sr;
+        self.transform = transform
+        self.s_transform = s_transform
+        self.data_root = data_root
+        self.signal_samples = signal_samples
+        self.signal_sr = signal_sr
 
         dataset = list(zip(*dataset))
         self.audio_files = list(dataset[0])
         self.audio_labels = dataset[1]
-        self.audio_labels = [ClassDict.getId(name) for name in self.audio_labels];
+        self.audio_labels = [ClassDict.getId(name) for name in self.audio_labels]
 
-        if(nsilence == -1):
-            nsilence = len(self.audio_files) // ClassDict.len();
+        if nsilence == -1:
+            nsilence = len(self.audio_files) // ClassDict.len()
 
-        self.nsilence = nsilence;
-        self.silence_label = ClassDict.len();
+        self.nsilence = nsilence
+        self.silence_label = ClassDict.len()
 
-        self.nfl, self.npd = utils.get_noise_files(noise_pkg, signal_sr);
+        self.nfl, self.npd = utils.get_noise_files(noise_pkg, signal_sr)
 
     def load_silence(self):
         signal = load.load_silence(self.nfl, self.npd, self.signal_samples, self.data_root, self.signal_sr);
-        tensor = self.s_transform(signal);
-        return tensor;
+        tensor = self.s_transform(signal)
+        return tensor
 
     def load_audio(self, idx):
         # signal = load.load_data(self.audio_labels[idx], self.audio_files[idx], self.signal_samples, self.data_root,
@@ -47,10 +47,10 @@ class ASCDataset(torch.utils.data.Dataset):
         # tensor = self.transform(signal);
         # return tensor;
         #TODO
-        file_path = os.path.join(self.data_root, self.audio_files[idx]);
+        file_path = os.path.join(self.data_root, self.audio_files[idx])
         sampling_rate, signal = wavfile.read(file_path)
-        tensor = self.transform(signal);
-        return tensor;
+        tensor = self.transform(signal)
+        return tensor
 
     def __getitem__(self, index):
         if index >= len(self.audio_labels):
@@ -65,58 +65,55 @@ class ASCDataset(torch.utils.data.Dataset):
 def get_transform(args):
 
     def debug(tensor):
-        print(tensor);
-        return tensor;
+        print(tensor)
+        return tensor
 
-    args.signal_width = 99; #TODO
-    if(args.features_name.lower() == 'logfbes'):
+    args.signal_width = 99 #TODO
+    if args.features_name.lower() == 'logfbes':
         features = transforms.LogFBEs(args.signal_sr, args.winlen, args.winstep, args.nfilt,
-                                    args.nfft, args.preemph);
+                                    args.nfft, args.preemph)
         args.nfeature = args.nfilt
-    elif(args.features_name.lower() == 'mfccs'):
+    elif args.features_name.lower() == 'mfccs':
         features = transforms.MFCCs(args.signal_sr, args.winlen, args.winstep, args.numcep, args.nfilt,
-                                    args.nfft, args.preemph, args.ceplifter);
+                                    args.nfft, args.preemph, args.ceplifter)
         args.nfeature = args.numcep
     else:
-        raise Exception('--features_name should be one of {LogFBEs | MFCCs}');
-
+        raise Exception('--features_name should be one of {LogFBEs | MFCCs}')
 
     test_trasform = transforms.Compose([
         features,
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.unsqueeze(0)),
-    ]);
+    ])
 
-    silence_transform = test_trasform;
+    silence_transform = test_trasform
 
-
-    args.signal_samples = args.signal_sr * args.signal_len;
-    args.bkg_noise_path = 'background_noise';
+    args.signal_samples = args.signal_sr * args.signal_len
+    args.bkg_noise_path = 'background_noise'
 
     noise_files, noise_probability_distribution = utils.get_noise_files(
         os.path.join(args.data_root, args.bkg_noise_path), signal_sr=args.signal_sr);
 
     train_transform = transforms.Compose([
         transforms.TimeScaling(scale_min=args.scale_min, scale_max=args.scale_max, amp_min=0, amp_max=1),  #TODO
-        transforms.TimeShifting(sec_min=args.shift_min, sec_max=args.shift_max, amp_min=0, amp_max=1),  #TODO
+        transforms.TimeShifting(shift_min=args.shift_min, shift_max=args.shift_max),
         transforms.AddNoise(noise_files, noise_probability_distribution, args.noise_vol,
                             args.signal_samples, args.data_root, args.signal_sr),  #TODO
         test_trasform,
-    ]);
-
+    ])
 
     return {'train': train_transform, 'val': test_trasform, 'test': test_trasform}, silence_transform;
 
 
 def get_dataloader(args):
-    args.nclass = ClassDict.len() + (args.nsilence != 0);
+    args.nclass = ClassDict.len() + (args.nsilence != 0)
     splits = ['train', 'val', 'test']
 
-    transform, s_transform = get_transform(args);
+    transform, s_transform = get_transform(args)
 
-    dataset = utils.split(args, args.pct_val, args.pct_test); #TODO
+    dataset = utils.split(args, args.pct_val, args.pct_test) #TODO
 
-    if(args.debug != -1):
+    if args.debug != -1:
         dataset = {split: dataset[split][:args.debug] for split in splits}
 
     dataset = {split: ASCDataset(args.data_root, dataset[split], transform[split], s_transform, args.nsilence,

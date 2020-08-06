@@ -84,19 +84,19 @@ class AddNoise(object):
 
 class TimeShifting(object):
 
-    def __init__(self, sec_min=0.1, sec_max=0.3, amp_min=-10, amp_max=10):
-        self.sec_min = sec_min
-        self.sec_max = sec_max
-        self.amp_min = amp_min
-        self.amp_max = amp_max
+    def __init__(self, shift_min=-0.3, shift_max=0.3):
+        self.shift_min = shift_min
+        self.shift_max = shift_max
 
     def __call__(self, signal):
-        sec = random.uniform(self.sec_min, self.sec_max)
-        num_pad = int(sec * len(signal))
-        padding = np.random.randint(self.amp_min, self.amp_max, num_pad, dtype=np.int16)
-        if random.choice([0, 1]) == 0:
+        shift_rand = random.uniform(self.shift_min, self.shift_max)
+        num_pad = int(shift_rand * len(signal))
+        padding = np.zeros(abs(num_pad), dtype=np.int16)
+        if num_pad > 0:
             return np.concatenate((padding, signal[:-num_pad]))
-        return np.concatenate((signal[num_pad:], padding))
+        elif num_pad < 0:
+            return np.concatenate((signal[-num_pad:], padding))
+        return signal
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
