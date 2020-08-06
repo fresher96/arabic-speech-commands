@@ -39,7 +39,7 @@ class ModelTrainer():
 
         self.experiment = Experiment(api_key=args.comet_key,
                                      project_name=args.comet_project, workspace=args.comet_workspace,
-                                     auto_weight_logging=True, auto_metric_logging=False)
+                                     auto_weight_logging=True, auto_metric_logging=False, auto_param_logging=False)
 
         self.experiment.set_name(args.name);
         self.experiment.log_parameters(vars(args));
