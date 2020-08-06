@@ -22,7 +22,7 @@ def set_defaults():
     parser.add_argument('--nsilence', type=int, default=-1, help='')
 
     # augmentations LogFBEs | MFCCs
-    parser.add_argument('--features_name', type=str, default='LogFBEs', help='LogFBEs | MFCCs')
+    parser.add_argument('--features_name', type=str, default='ta.MFCC', help='LogFBEs | MFCCs | ta.MFCC')
     parser.add_argument('--nfilt', type=int, default=40, help='')
     parser.add_argument('--winlen', type=float, default=0.025, help='')
     parser.add_argument('--winstep', type=float, default=0.010, help='')
@@ -49,7 +49,7 @@ def set_defaults():
 
     # training configs
     parser.add_argument('--weight_decay', type=float, default=1e-5)
-    parser.add_argument('--nepoch', type=int, default=2, help='number of epochs to train for')
+    parser.add_argument('--nepoch', type=int, default=10, help='number of epochs to train for')
     parser.add_argument('--batchsize', type=int, default=32, help='input batch size')
     parser.add_argument('--metric', type=str, default='acc', help='')
     parser.add_argument('--lr', type=float, default=0.01, help='learning rate')

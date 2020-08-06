@@ -15,7 +15,7 @@ class LogisticRegression(nn.Module):
         self.fc = nn.Linear(self.input_shape, args.nclass)
 
     def forward(self, x):
-        print(x.size());
+        # print(x.size());
         x = x.view(-1, self.input_shape)
         x = self.dropout(x);
         x = self.fc(x)

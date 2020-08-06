@@ -65,19 +65,29 @@ def get_transform(args):
 
     args.signal_width = int(np.ceil((args.signal_len - args.winlen) / args.winstep) + 1)
     if args.features_name.lower() == 'logfbes':
-        features = transforms.LogFBEs(args.signal_sr, args.winlen, args.winstep, args.nfilt,
-                                    args.nfft, args.preemph)
+        features = transforms.Compose([
+            transforms.LogFBEs(args.signal_sr, args.winlen, args.winstep, args.nfilt,
+                                    args.nfft, args.preemph),
+            transforms.ToTensor(),
+            ])
         args.nfeature = args.nfilt
     elif args.features_name.lower() == 'mfccs':
-        features = transforms.MFCCs(args.signal_sr, args.winlen, args.winstep, args.numcep, args.nfilt,
-                                    args.nfft, args.preemph, args.ceplifter)
+        features = transforms.Compose([
+            transforms.MFCCs(args.signal_sr, args.winlen, args.winstep, args.numcep, args.nfilt,
+                                    args.nfft, args.preemph, args.ceplifter),
+            transforms.ToTensor(),
+            ])
         args.nfeature = args.numcep
+    elif args.features_name.lower() == 'ta.mfcc':
+        features = transforms.Compose([
+            transforms.ToTensor(),
+            torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep),
+        ]);
     else:
-        raise Exception('--features_name should be one of {LogFBEs | MFCCs}')
+        raise Exception('--features_name should be one of {LogFBEs | MFCCs | ta.mfcc}')
 
     test_trasform = transforms.Compose([
         features,
-        transforms.ToTensor(),
         transforms.Lambda(lambda x: x.unsqueeze(0)),
     ])
 
