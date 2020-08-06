@@ -41,12 +41,6 @@ class ASCDataset(torch.utils.data.Dataset):
         return tensor
 
     def load_audio(self, idx):
-        # signal = load.load_data(self.audio_labels[idx], self.audio_files[idx], self.signal_samples, self.data_root,
-        #                         self.signal_sr, check_length=True)
-        #
-        # tensor = self.transform(signal);
-        # return tensor;
-        #TODO
         file_path = os.path.join(self.data_root, self.audio_files[idx])
         sampling_rate, signal = wavfile.read(file_path)
         tensor = self.transform(signal)
@@ -68,7 +62,7 @@ def get_transform(args):
         print(tensor)
         return tensor
 
-    args.signal_width = 99 #TODO
+    args.signal_width = int(np.ceil((args.signal_len - args.winlen) / args.winstep) + 1)
     if args.features_name.lower() == 'logfbes':
         features = transforms.LogFBEs(args.signal_sr, args.winlen, args.winstep, args.nfilt,
                                     args.nfft, args.preemph)
