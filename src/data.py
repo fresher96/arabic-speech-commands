@@ -105,7 +105,7 @@ def get_dataloader(args):
 
     transform, s_transform = get_transform(args)
 
-    dataset = utils.split(args, args.pct_val, args.pct_test) #TODO
+    dataset = utils.read_splits(args.data_root)
 
     if args.debug != -1:
         dataset = {split: dataset[split][:args.debug] for split in splits}
