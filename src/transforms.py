@@ -36,6 +36,7 @@ class Compose(object):
         format_string += '\n)'
         return format_string
 
+
 class Lambda(object):
     """Apply a user-defined lambda as a transform.
 
@@ -52,6 +53,7 @@ class Lambda(object):
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
+
 
 class ToTensor(object):
 
@@ -75,7 +77,7 @@ class AddNoise(object):
     def __call__(self, signal):
         bkg_noise = load_silence(self.noise_files, self.noise_probability_distribution,
                                  self.signal_samples, self.data_root, self.signal_sr)
-        bkg_noise_volume = random.uniform(0.01, self.volume_rate)
+        bkg_noise_volume = random.uniform(0.0, self.volume_rate)
         return signal + np.array(bkg_noise * bkg_noise_volume, dtype=np.int16)
 
     def __repr__(self):
@@ -132,12 +134,12 @@ class TimeScaling(object):
 class LogFBEs(object):
 
     def __init__(self, samplerate, winlen, winstep, nfilt, nfft, preemph):
-        self.samplerate = samplerate;
-        self.winlen = winlen;
-        self.winstep = winstep;
-        self.nfilt = nfilt;
-        self.nfft = nfft;
-        self.preemph = preemph;
+        self.samplerate = samplerate
+        self.winlen = winlen
+        self.winstep = winstep
+        self.nfilt = nfilt
+        self.nfft = nfft
+        self.preemph = preemph
 
     def __call__(self, signal):
         features = logfbank(signal, samplerate=self.samplerate, winlen=self.winlen,
@@ -152,14 +154,14 @@ class LogFBEs(object):
 class MFCCs(object):
 
     def __init__(self, samplerate, winlen, winstep, numcep, nfilt, nfft, preemph, ceplifter):
-        self.samplerate = samplerate;
-        self.winlen = winlen;
-        self.winstep = winstep;
-        self.numcep = numcep,
-        self.nfilt = nfilt;
-        self.nfft = nfft;
-        self.preemph = preemph;
-        self.ceplifter = ceplifter;
+        self.samplerate = samplerate
+        self.winlen = winlen
+        self.winstep = winstep
+        self.numcep = numcep
+        self.nfilt = nfilt
+        self.nfft = nfft
+        self.preemph = preemph
+        self.ceplifter = ceplifter
 
     def __call__(self, signal):
         features = mfcc(signal, samplerate=self.samplerate, winlen=self.winlen,

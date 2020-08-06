@@ -62,7 +62,7 @@ def set_defaults():
 
     # model architecture
     parser.add_argument('--model', type=str, default='ResNet',
-                        help='LogisticRegression | CompressModel | ConvNet | ResNet');
+                        help='LogisticRegression | CompressModel | ConvNet | ResNet')
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--nlayer', type=int, default=8)
     parser.add_argument('--nchannel', type=int, default=19)

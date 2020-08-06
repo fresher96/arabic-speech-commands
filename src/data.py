@@ -98,7 +98,7 @@ def get_transform(args):
         transforms.TimeScaling(scale_min=args.scale_min, scale_max=args.scale_max, amp_min=0, amp_max=1),  #TODO
         transforms.TimeShifting(shift_min=args.shift_min, shift_max=args.shift_max),
         transforms.AddNoise(noise_files, noise_probability_distribution, args.noise_vol,
-                            args.signal_samples, args.data_root, args.signal_sr),  #TODO
+                            args.signal_samples, args.data_root, args.signal_sr),
         test_trasform,
     ])
 
