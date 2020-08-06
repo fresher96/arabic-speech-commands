@@ -15,8 +15,6 @@ def set_defaults():
 
     # data files configs
     parser.add_argument('--data_root', type=str, default='.', help='path to dataset')
-    parser.add_argument('--pct_val', type=float, default=0.20, help='')
-    parser.add_argument('--pct_test', type=float, default=0.20, help='')
 
     # audio data configs
     parser.add_argument('--signal_sr', type=int, default=16000, help='')
