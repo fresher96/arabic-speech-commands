@@ -83,6 +83,7 @@ def get_transform(args):
             transforms.ToTensor(),
             torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep),
         ]);
+        args.nfeature = args.numcep
     else:
         raise Exception('--features_name should be one of {LogFBEs | MFCCs | ta.mfcc}')
 

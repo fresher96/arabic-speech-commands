@@ -36,7 +36,7 @@ def set_defaults():
     parser.add_argument('--scale_max', type=float, default=1.2, help='')
     parser.add_argument('--shift_min', type=float, default=-0.3, help='')
     parser.add_argument('--shift_max', type=float, default=0.3, help='')
-    parser.add_argument('--noise_vol', type=float, default=0.5, help='')
+    parser.add_argument('--noise_vol', type=float, default=0.25, help='')
 
     # experiment configs
     parser.add_argument('--name', type=str, default='untitled', help='name of the experiment')
@@ -59,7 +59,7 @@ def set_defaults():
     parser.add_argument('--scheduler', type=str, default='none', help='auto | set | none')
 
     # model architecture
-    parser.add_argument('--model', type=str, default='ResNet',
+    parser.add_argument('--model', type=str, default='LogisticRegression',
                         help='LogisticRegression | CompressModel | ConvNet | ResNet')
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--nlayer', type=int, default=8)
