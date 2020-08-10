@@ -67,7 +67,9 @@ def set_defaults():
     parser.add_argument('--res_pool', type=tuple, default=(1, 1))
     parser.add_argument('--use_dilation', action='store_true', default=False)
 
-    return parser.parse_args()
+    # args, unknown = parser.parse_known_args()
+    args = parser.parse_args();
+    return args
 
 
 def get_args():
