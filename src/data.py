@@ -102,10 +102,10 @@ def get_transform(args):
         os.path.join(args.data_root, args.bkg_noise_path), signal_sr=args.signal_sr)
 
     train_transform = transforms.Compose([
-        # transforms.TimeScaling(scale_min=args.scale_min, scale_max=args.scale_max),
-        # transforms.TimeShifting(shift_min=args.shift_min, shift_max=args.shift_max),
-        # transforms.AddNoise(noise_files, noise_probability_distribution, args.noise_vol,
-        #                     args.signal_samples, args.data_root, args.signal_sr),
+        transforms.TimeScaling(scale_min=args.scale_min, scale_max=args.scale_max),
+        transforms.TimeShifting(shift_min=args.shift_min, shift_max=args.shift_max),
+        transforms.AddNoise(noise_files, noise_probability_distribution, args.noise_vol,
+                            args.signal_samples, args.data_root, args.signal_sr),
         test_trasform,
     ])
 
