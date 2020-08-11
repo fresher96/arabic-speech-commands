@@ -32,6 +32,7 @@ def set_defaults():
     parser.add_argument('--ceplifter', type=int, default=22, help='')
 
     # augmentations
+    parser.add_argument('--use_augmentations', action='store_true', default=False)
     parser.add_argument('--scale_min', type=float, default=0.95, help='')
     parser.add_argument('--scale_max', type=float, default=1.1, help='')
     parser.add_argument('--shift_min', type=float, default=-0.2, help='')
