@@ -125,7 +125,7 @@ class ModelTrainer():
                 print('learning rate changed to: %.10f'% lr)
 
             elif(self.args.scheduler == 'auto'):
-                self.scheduler.step(res['loss']);
+                self.scheduler.step(train_res['loss']);
         print(">> Training model %s.[Done]" % self.model.name)
 
         if(self.args.scheduler == 'set'):
