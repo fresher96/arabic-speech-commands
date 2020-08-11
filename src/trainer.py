@@ -8,6 +8,7 @@ from tqdm import tqdm
 import numpy as np;
 import random;
 from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
 
 from src.ClassDict import ClassDict;
 
@@ -32,7 +33,7 @@ class ModelTrainer():
             raise Exception('--optimizer should be one of {sgd, adam}');
 
         if(args.scheduler == 'set'):
-            self.scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lambda epoch: 10**(epoch/20))
+            self.scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lambda epoch: 10**(epoch/5))
         elif(args.scheduler == 'auto'):
             self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.1, patience=5,
                                                                   verbose=True, threshold=0.0001, threshold_mode='rel',
@@ -93,15 +94,17 @@ class ModelTrainer():
         print('Epoch: {} [Done]\tLoss: {:.4f}\tAccuracy: {}/{} ({:.2f}%)'.format(
             epoch + 1, train_loss, correct, len(train_loader.dataset), acc))
 
+        return {'loss': train_loss, 'acc': acc};
 
     def train(self):
 
         best = -1
+        history = {'lr': [], 'train_loss': []};
 
         print(">> Training %s" % self.model.name)
         for epoch in range(self.args.nepoch):
             with self.experiment.train():
-                self.train_one_epoch(epoch)
+                train_res = self.train_one_epoch(epoch)
 
             with self.experiment.validate():
                 print("\nvalidation...");
@@ -113,12 +116,27 @@ class ModelTrainer():
                 self.save_weights(epoch)
 
             if(self.args.scheduler == 'set'):
-                self.scheduler.step(epoch);
-                print('learning rate changed to: %.10f'% self.optimizer.param_groups[0]['lr'])
+                lr = self.optimizer.param_groups[0]['lr'];
+                history['lr'].append(lr);
+                history['train_loss'].append(train_res['loss']);
+
+                self.scheduler.step(epoch + 1);
+                lr = self.optimizer.param_groups[0]['lr'];
+                print('learning rate changed to: %.10f'% lr)
+
             elif(self.args.scheduler == 'auto'):
                 self.scheduler.step(res['loss']);
-
         print(">> Training model %s.[Done]" % self.model.name)
+
+        if(self.args.scheduler == 'set'):
+            plt.semilogx(history['lr'], history['train_loss'])
+
+            plt.xlabel('lr')
+            plt.ylabel('train_loss')
+            plt.grid(True)
+
+            self.experiment.log_figure(figure=plt)
+            plt.show();
 
     def val(self, val_loader, comet_offset=-1, epoch=-1):
         self.model.eval()

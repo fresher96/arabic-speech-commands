@@ -49,14 +49,14 @@ def set_defaults():
 
     # training configs
     parser.add_argument('--weight_decay', type=float, default=1e-5)
-    parser.add_argument('--nepoch', type=int, default=10, help='number of epochs to train for')
+    parser.add_argument('--nepoch', type=int, default=6, help='number of epochs to train for')
     parser.add_argument('--batchsize', type=int, default=32, help='input batch size')
     parser.add_argument('--metric', type=str, default='acc', help='')
     parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
     parser.add_argument('--momentum', type=float, default=0.9, help='')
     parser.add_argument('--beta1', type=float, default=0.9, help='')
     parser.add_argument('--optimizer', type=str, default='sgd', help='adam | sgd')
-    parser.add_argument('--scheduler', type=str, default='none', help='auto | set | none')
+    parser.add_argument('--scheduler', type=str, default='set', help='auto | set | none')
 
     # model architecture
     parser.add_argument('--model', type=str, default='LogisticRegression',
