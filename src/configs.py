@@ -28,8 +28,8 @@ def set_defaults():
     parser.add_argument('--winstep', type=float, default=0.010, help='')
     parser.add_argument('--nfft', type=int, default=512, help='')
     parser.add_argument('--preemph', type=float, default=0.97, help='')
-    parser.add_argument('--ceplifter', type=int, default=22, help='')
     parser.add_argument('--numcep', type=int, default=13, help='')
+    parser.add_argument('--ceplifter', type=int, default=22, help='')
 
     # augmentations
     parser.add_argument('--scale_min', type=float, default=0.8, help='')
