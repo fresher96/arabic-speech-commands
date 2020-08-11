@@ -101,42 +101,42 @@ class ModelTrainer():
         best = -1
         history = {'lr': [], 'train_loss': []};
 
-        print(">> Training %s" % self.model.name)
-        for epoch in range(self.args.nepoch):
-            with self.experiment.train():
-                train_res = self.train_one_epoch(epoch)
+        try:
+            print(">> Training %s" % self.model.name)
+            for epoch in range(self.args.nepoch):
+                with self.experiment.train():
+                    train_res = self.train_one_epoch(epoch)
 
-            with self.experiment.validate():
-                print("\nvalidation...");
-                comet_offset = (epoch + 1) * len(self.data['train']) - 1;
-                res = self.val(self.data['val'], comet_offset, epoch)
+                with self.experiment.validate():
+                    print("\nvalidation...");
+                    comet_offset = (epoch + 1) * len(self.data['train']) - 1;
+                    res = self.val(self.data['val'], comet_offset, epoch)
 
-            if res[self.metric] > best:
-                best = res[self.metric]
-                self.save_weights(epoch)
+                if res[self.metric] > best:
+                    best = res[self.metric]
+                    self.save_weights(epoch)
 
+                if(self.args.scheduler == 'set'):
+                    lr = self.optimizer.param_groups[0]['lr'];
+                    history['lr'].append(lr);
+                    history['train_loss'].append(train_res['loss']);
+
+                    self.scheduler.step(epoch + 1);
+                    lr = self.optimizer.param_groups[0]['lr'];
+                    print('learning rate changed to: %.10f'% lr)
+
+                elif(self.args.scheduler == 'auto'):
+                    self.scheduler.step(train_res['loss']);
+            print(">> Training model %s.[Done]" % self.model.name)
+        finally:
             if(self.args.scheduler == 'set'):
-                lr = self.optimizer.param_groups[0]['lr'];
-                history['lr'].append(lr);
-                history['train_loss'].append(train_res['loss']);
+                plt.semilogx(history['lr'], history['train_loss'])
+                plt.grid(True)
+                self.experiment.log_figure(figure=plt)
+                plt.show();
+            self.experiment.log_asset_folder(os.path.join(self.args.outf, self.args.name, 'weights'),
+                                             step=None, log_file_name=False, recursive=False)
 
-                self.scheduler.step(epoch + 1);
-                lr = self.optimizer.param_groups[0]['lr'];
-                print('learning rate changed to: %.10f'% lr)
-
-            elif(self.args.scheduler == 'auto'):
-                self.scheduler.step(train_res['loss']);
-        print(">> Training model %s.[Done]" % self.model.name)
-
-        if(self.args.scheduler == 'set'):
-            plt.semilogx(history['lr'], history['train_loss'])
-
-            plt.xlabel('lr')
-            plt.ylabel('train_loss')
-            plt.grid(True)
-
-            self.experiment.log_figure(figure=plt)
-            plt.show();
 
     def val(self, val_loader, comet_offset=-1, epoch=-1):
         self.model.eval()
