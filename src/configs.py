@@ -42,7 +42,7 @@ def set_defaults():
     parser.add_argument('--name', type=str, default='untitled', help='name of the experiment')
     parser.add_argument('--outf', type=str, default='./output', help='folder to output images and model checkpoints')
     parser.add_argument('--seed', default=-1, type=int, help='manual seed')
-    parser.add_argument('--frq_log', type=int, default=2, help='frequency of showing training results on console')
+    parser.add_argument('--frq_log', type=int, default=4, help='frequency of showing training results on console')
     parser.add_argument('--debug', type=int, default=32 * 4, help='')
     parser.add_argument('--test', action='store_true', default=False, help='load weights and run on test set')
     parser.add_argument('--weights_path', type=str, default=None, help='')

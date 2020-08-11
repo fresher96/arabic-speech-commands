@@ -129,7 +129,8 @@ def get_dataloader(args):
 
     dataloader = {split: torch.utils.data.DataLoader(dataset=dataset[split],
                                                      batch_size=args.batchsize,
-                                                     shuffle=(split == 'train'))
+                                                     shuffle=(split == 'train'),
+                                                     drop_last=True)
                   for split in splits}
 
     return dataloader

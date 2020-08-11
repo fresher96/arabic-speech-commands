@@ -19,6 +19,7 @@ class ModelTrainer():
         self.args = args
         self.data = dataloader
         self.metric = args.metric;
+        args.frq_log = len(dataloader['train']) // args.frq_log;
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         model.to(self.device);
