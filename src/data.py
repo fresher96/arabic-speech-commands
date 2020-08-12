@@ -142,8 +142,8 @@ def get_transform(args):
     else:
         train_transform = transforms.Compose([
             transforms.TimeShifting2(shift_min=args.shift_min, shift_max=args.shift_max),
-            # transforms.AddNoise(noise_files, noise_probability_distribution, args.noise_vol,
-            #                     args.signal_samples, args.data_root, args.signal_sr),
+            transforms.AddNoise2(os.path.join(args.data_root, args.bkg_noise_path),
+                                 args.noise_vol, args.signal_samples, args.signal_sr),
             test_trasform,
             # torchaudio.transforms.TimeMasking(100),
             # torchaudio.transforms.FrequencyMasking(4),
