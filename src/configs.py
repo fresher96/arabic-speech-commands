@@ -39,6 +39,7 @@ def set_defaults():
     parser.add_argument('--shift_min', type=float, default=-0.2, help='')
     parser.add_argument('--shift_max', type=float, default=0.2, help='')
     parser.add_argument('--noise_vol', type=float, default=0.20, help='')
+    parser.add_argument('--silence_vol', type=float, default=0.4, help='')
 
     # experiment configs
     parser.add_argument('--name', type=str, default='untitled', help='name of the experiment')
@@ -58,7 +59,7 @@ def set_defaults():
     parser.add_argument('--momentum', type=float, default=0.0, help='')
     parser.add_argument('--beta1', type=float, default=0.9, help='')
     parser.add_argument('--optimizer', type=str, default='sgd', help='adam | sgd')
-    parser.add_argument('--scheduler', type=str, default='set', help='auto | set | none')
+    parser.add_argument('--scheduler', type=str, default='none', help='auto | set | none')
     parser.add_argument('--scheduler_factor', type=float, default=0.5, help='')
 
     # model architecture

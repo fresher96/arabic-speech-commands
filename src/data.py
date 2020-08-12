@@ -9,6 +9,7 @@ from src import utils
 from src import transforms
 from src.ClassDict import ClassDict
 from src import load
+import random
 
 
 class ASCDataset(torch.utils.data.Dataset):
@@ -34,17 +35,27 @@ class ASCDataset(torch.utils.data.Dataset):
         self.silence_label = ClassDict.len()
 
         self.nfl, self.npd = utils.get_noise_files(noise_pkg, signal_sr)
+        self.noise_pkg = noise_pkg;
 
     def load_silence(self):
-        signal = load.load_silence(self.nfl, self.npd, self.signal_samples, self.data_root, self.signal_sr)
-        tensor = self.s_transform(signal)
+        file_name = np.random.choice(self.nfl, p=self.npd)
+        file_path = os.path.join(self.noise_pkg, file_name)
+        signal = self.load_path(file_path)
+        start_index = np.random.randint(0, signal.size()[0] - self.signal_samples)
+        silence = signal[start_index : start_index + self.signal_samples]
+
+        tensor = self.s_transform(silence)
         return tensor
 
+    def load_path(self, path):
+        x, sr = torchaudio.load(path)
+        x = x.squeeze()
+        return x
+
     def load_audio(self, idx):
-        file_path = os.path.join(self.data_root, *self.audio_files[idx].split('\\'))
-        # file_path = load.load_data(self.class_name, file_name, signal_samples, self.data_root, signal_sr)
-        sampling_rate, signal = wavfile.read(file_path)
-        tensor = self.transform(signal)
+        file_path = os.path.join(self.data_root, self.audio_files[idx])
+        x = self.load_path(file_path);
+        tensor = self.transform(x)
         return tensor
 
     def __getitem__(self, index):
@@ -83,7 +94,7 @@ def get_transform(args):
         args.nfeature = args.numcep
     elif args.features_name.lower() == 'ta.mfccs':
         features = transforms.Compose([
-            transforms.ToTensor(),
+            # transforms.ToTensor(),
             torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep, melkwargs=melkwargs),
         ]);
         args.nfeature = args.numcep
@@ -91,7 +102,7 @@ def get_transform(args):
     elif args.features_name.lower() == 'ta.logfbes':
         log_offset = 1e-6;
         features = transforms.Compose([
-            transforms.ToTensor(),
+            # transforms.ToTensor(),
             torchaudio.transforms.MelSpectrogram(sample_rate=args.signal_sr, **melkwargs),
             transforms.Lambda(lambda t: torch.log(t + log_offset)),
         ]);
@@ -100,18 +111,25 @@ def get_transform(args):
     else:
         raise Exception('--features_name should be one of {LogFBEs | MFCCs | ta.mfcc}')
 
+
+
     test_trasform = transforms.Compose([
         features,
         transforms.Lambda(lambda x: x.unsqueeze(0)),
     ])
 
-    silence_transform = test_trasform
+    silence_transform = transforms.Compose([
+        transforms.Lambda(lambda x: x * random.uniform(0.0, args.silence_vol)),
+        test_trasform,
+    ])
 
     args.signal_samples = args.signal_sr * args.signal_len
     args.bkg_noise_path = 'background_noise'
 
     noise_files, noise_probability_distribution = utils.get_noise_files(
         os.path.join(args.data_root, args.bkg_noise_path), signal_sr=args.signal_sr)
+
+
 
     if(args.use_augmentations):
         train_transform = transforms.Compose([
