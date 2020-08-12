@@ -78,7 +78,14 @@ def get_transform(args):
             transforms.ToTensor(),
             ])
         args.nfeature = args.numcep
-    elif args.features_name.lower() == 'ta.mfcc':
+    elif args.features_name.lower() == 'ta.logfbes':
+        features = transforms.Compose([
+            transforms.ToTensor(),
+            torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep),
+        ]);
+        args.nfeature = args.numcep
+        args.signal_width = 81;
+    elif args.features_name.lower() == 'ta.mfccs':
         features = transforms.Compose([
             transforms.ToTensor(),
             torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep),

@@ -171,15 +171,17 @@ class MatlabModel(nn.Module):
         numF = 12; # change to 40 or 41?
 
         w = args.signal_width;
-        w = (w - 1) // 2;
-        w = (w - 1) // 2;
-        w = (w - 1) // 2;
+        w = (w - 1) // 2 + 1;
+        w = (w - 1) // 2 + 1;
+        w = (w - 1) // 2 + 1;
 
         h = args.nfeature;
-        h = (h - 1) // 2;
-        h = (h - 1) // 2;
-        h = (h - 1) // 2;
+        h = (h - 1) // 2 + 1;
+        h = (h - 1) // 2 + 1;
+        h = (h - 1) // 2 + 1;
 
+        s = 2;
+        p = 1;
 
         # input dims: batchsize | channels = 1 | height = args.nfeature | width = args.signal_width
         self.layers = nn.Sequential(
@@ -187,25 +189,25 @@ class MatlabModel(nn.Module):
             nn.Conv2d(in_channels=1, out_channels=numF, kernel_size=3, padding=1),
             nn.BatchNorm2d(num_features=numF),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+            nn.MaxPool2d(kernel_size=3, stride=s, padding=p),
 
 
             nn.Conv2d(in_channels=numF, out_channels=2*numF, kernel_size=3, padding=1),
             nn.BatchNorm2d(num_features=2*numF),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+            nn.MaxPool2d(kernel_size=3, stride=s, padding=p),
 
 
             nn.Conv2d(in_channels=2*numF, out_channels=4*numF, kernel_size=3, padding=1),
             nn.BatchNorm2d(num_features=4*numF),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+            nn.MaxPool2d(kernel_size=3, stride=s, padding=p),
 
 
-            nn.Conv2d(in_channels=2 * numF, out_channels=4 * numF, kernel_size=3, padding=1),
+            nn.Conv2d(in_channels=4 * numF, out_channels=4 * numF, kernel_size=3, padding=1),
             nn.BatchNorm2d(num_features=4 * numF),
             nn.ReLU(),
-            nn.Conv2d(in_channels=2 * numF, out_channels=4 * numF, kernel_size=3, padding=1),
+            nn.Conv2d(in_channels=4 * numF, out_channels=4 * numF, kernel_size=3, padding=1),
             nn.BatchNorm2d(num_features=4 * numF),
             nn.ReLU(),
 
@@ -215,7 +217,7 @@ class MatlabModel(nn.Module):
 
             nn.Dropout2d(p=args.dropout),
             nn.Flatten(start_dim=1),
-            nn.Linear(in_features=4 * numF * h * w, out_features=args.nclass),
+            nn.Linear(in_features=4 * numF * h * 1, out_features=args.nclass),
         );
 
     def forward(self, x):
