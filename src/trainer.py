@@ -127,15 +127,13 @@ class ModelTrainer():
 
                 elif(self.args.scheduler == 'auto'):
                     self.scheduler.step(train_res['loss']);
-            print(">> Training model %s.[Done]" % self.model.name)
         finally:
+            print(">> Training model %s.[Done]" % self.model.name)
             if(self.args.scheduler == 'set'):
                 plt.semilogx(history['lr'], history['train_loss'])
                 plt.grid(True)
                 self.experiment.log_figure(figure=plt)
                 plt.show();
-            self.experiment.log_asset_folder(os.path.join(self.args.outf, self.args.name, 'weights'),
-                                             step=None, log_file_name=False, recursive=False)
 
 
     def val(self, val_loader, comet_offset=-1, epoch=-1):
@@ -189,6 +187,9 @@ class ModelTrainer():
         if not os.path.exists(weight_dir): os.makedirs(weight_dir)
 
         torch.save({'epoch': epoch, 'state_dict': self.model.state_dict()}, os.path.join(weight_dir, 'model.pth'))
+
+        self.experiment.log_asset_folder(os.path.join(self.args.outf, self.args.name, 'weights'),
+                                         step=None, log_file_name=False, recursive=False)
 
 
     def load_weights(self):
