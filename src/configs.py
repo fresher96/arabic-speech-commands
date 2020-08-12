@@ -24,11 +24,11 @@ def set_defaults():
     # augmentations LogFBEs | MFCCs
     parser.add_argument('--features_name', type=str, default='ta.MFCCs', help='LogFBEs | MFCCs | ta.MFCCs')
     parser.add_argument('--nfilt', type=int, default=40, help='')
+    parser.add_argument('--numcep', type=int, default=13, help='')
     parser.add_argument('--winlen', type=float, default=0.025, help='')
     parser.add_argument('--winstep', type=float, default=0.010, help='')
     parser.add_argument('--nfft', type=int, default=512, help='')
     parser.add_argument('--preemph', type=float, default=0.97, help='')
-    parser.add_argument('--numcep', type=int, default=40, help='')
     parser.add_argument('--ceplifter', type=int, default=22, help='')
 
     # augmentations

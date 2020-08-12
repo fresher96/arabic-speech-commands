@@ -59,9 +59,12 @@ class ASCDataset(torch.utils.data.Dataset):
 
 def get_transform(args):
 
-    def debug(tensor):
-        print(tensor)
-        return tensor
+    melkwargs = {
+        'n_fft': args.nfft,
+        'win_length': args.winlen,
+        'hop_length': args.winstep,
+        'n_mels': args.nfilt,
+    };
 
     args.signal_width = int(np.ceil((args.signal_len - args.winlen) / args.winstep) + 1)
     if args.features_name.lower() == 'logfbes':
@@ -78,20 +81,22 @@ def get_transform(args):
             transforms.ToTensor(),
             ])
         args.nfeature = args.numcep
-    elif args.features_name.lower() == 'ta.logfbes':
-        features = transforms.Compose([
-            transforms.ToTensor(),
-            torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep),
-        ]);
-        args.nfeature = args.numcep
-        args.signal_width = 81;
     elif args.features_name.lower() == 'ta.mfccs':
         features = transforms.Compose([
             transforms.ToTensor(),
-            torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep),
+            torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep, melkwargs=melkwargs),
         ]);
         args.nfeature = args.numcep
-        args.signal_width = 81;
+        # args.signal_width = 81;
+    elif args.features_name.lower() == 'ta.logfbes':
+        log_offset = 1e-6;
+        features = transforms.Compose([
+            transforms.ToTensor(),
+            torchaudio.transforms.MelSpectrogram(sample_rate=args.signal_sr, n_mfcc=args.numcep),
+            transforms.Lambda(lambda t: torch.log(t + log_offset)),
+        ]);
+        args.nfeature = args.nfilt
+        # args.signal_width = 81;
     else:
         raise Exception('--features_name should be one of {LogFBEs | MFCCs | ta.mfcc}')
 
