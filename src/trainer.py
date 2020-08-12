@@ -33,7 +33,7 @@ class ModelTrainer():
             raise Exception('--optimizer should be one of {sgd, adam}');
 
         if(args.scheduler == 'set'):
-            self.scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lambda epoch: 10**(epoch/5))
+            self.scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lambda epoch: 10**(epoch/10))
         elif(args.scheduler == 'auto'):
             self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min', factor=0.1, patience=7,
                                                                   verbose=True, threshold=0.0001, threshold_mode='rel',
