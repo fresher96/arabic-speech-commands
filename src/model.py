@@ -126,52 +126,97 @@ class MatlabModel(nn.Module):
     """
     Taken from:
     https://www.mathworks.com/help/deeplearning/ug/deep-learning-speech-recognition.html
+
+    layers = [
+        imageInputLayer([numHops numBands])
+
+        convolution2dLayer(3,numF,'Padding','same')
+        batchNormalizationLayer
+        reluLayer
+
+        maxPooling2dLayer(3,'Stride',2,'Padding','same')
+
+        convolution2dLayer(3,2*numF,'Padding','same')
+        batchNormalizationLayer
+        reluLayer
+
+        maxPooling2dLayer(3,'Stride',2,'Padding','same')
+
+        convolution2dLayer(3,4*numF,'Padding','same')
+        batchNormalizationLayer
+        reluLayer
+
+        maxPooling2dLayer(3,'Stride',2,'Padding','same')
+
+        convolution2dLayer(3,4*numF,'Padding','same')
+        batchNormalizationLayer
+        reluLayer
+        convolution2dLayer(3,4*numF,'Padding','same')
+        batchNormalizationLayer
+        reluLayer
+
+        maxPooling2dLayer([timePoolSize,1])
+
+        dropoutLayer(dropoutProb)
+        fullyConnectedLayer(numClasses)
+        softmaxLayer
+        weightedClassificationLayer(classWeights)
+    ];
     """
 
     def __init__(self, args):
         super().__init__()
-
         self.name = self.__class__.__name__;
 
-        n_labels = args.nclass
-        n_maps = args.nchannel
-        self.conv0 = nn.Conv2d(1, n_maps, (3, 3), padding=(1, 1), bias=False)
+        numF = 12; # change to 40 or 41?
 
-        if args.res_pool != (1, 1):
-            self.pool = nn.AvgPool2d(args.res_pool)
+        w = args.signal_width;
+        w = (w - 1) // 2;
+        w = (w - 1) // 2;
+        w = (w - 1) // 2;
 
-        self.n_layers = n_layers = args.nlayer;
-        dilation = args.use_dilation
+        h = args.nfeature;
+        h = (h - 1) // 2;
+        h = (h - 1) // 2;
+        h = (h - 1) // 2;
 
-        if dilation:
-            self.convs = [nn.Conv2d(n_maps, n_maps, (3, 3), padding=int(2**(i // 3)), dilation=int(2**(i // 3)),
-                bias=False) for i in range(n_layers)]
-        else:
-            self.convs = [nn.Conv2d(n_maps, n_maps, (3, 3), padding=1, dilation=1,
-                bias=False) for _ in range(n_layers)]
 
-        for i, conv in enumerate(self.convs):
-            self.add_module("bn{}".format(i + 1), nn.BatchNorm2d(n_maps, affine=False))
-            self.add_module("conv{}".format(i + 1), conv)
+        # input dims: batchsize | channels = 1 | height = args.nfeature | width = args.signal_width
+        self.layers = nn.Sequential(
 
-        self.output = nn.Linear(n_maps, n_labels)
+            nn.Conv2d(in_channels=1, out_channels=numF, kernel_size=3, padding=1),
+            nn.BatchNorm2d(num_features=numF),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+
+
+            nn.Conv2d(in_channels=numF, out_channels=2*numF, kernel_size=3, padding=1),
+            nn.BatchNorm2d(num_features=2*numF),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+
+
+            nn.Conv2d(in_channels=2*numF, out_channels=4*numF, kernel_size=3, padding=1),
+            nn.BatchNorm2d(num_features=4*numF),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+
+
+            nn.Conv2d(in_channels=2 * numF, out_channels=4 * numF, kernel_size=3, padding=1),
+            nn.BatchNorm2d(num_features=4 * numF),
+            nn.ReLU(),
+            nn.Conv2d(in_channels=2 * numF, out_channels=4 * numF, kernel_size=3, padding=1),
+            nn.BatchNorm2d(num_features=4 * numF),
+            nn.ReLU(),
+
+
+            nn.MaxPool2d(kernel_size=(1, w)),
+
+
+            nn.Dropout2d(p=args.dropout),
+            nn.Flatten(start_dim=1),
+            nn.Linear(in_features=4 * numF * h * w, out_features=args.nclass),
+        );
 
     def forward(self, x):
-
-        for i in range(self.n_layers + 1):
-            y = F.relu(getattr(self, "conv{}".format(i))(x))
-            if i == 0:
-                if hasattr(self, "pool"):
-                    y = self.pool(y)
-                old_x = y
-            if i > 0 and i % 2 == 0:
-                x = y + old_x
-                old_x = x
-            else:
-                x = y
-            if i > 0:
-                x = getattr(self, "bn{}".format(i))(x)
-
-        x = x.view(x.size(0), x.size(1), -1) # shape: (batch, feats, o3)
-        x = torch.mean(x, 2)
-        return self.output(x)
+        return self.layers(x);

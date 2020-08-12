@@ -128,7 +128,7 @@ class ModelTrainer():
                 elif(self.args.scheduler == 'auto'):
                     self.scheduler.step(train_res['loss']);
         finally:
-            print(">> Training model %s.[Done]" % self.model.name)
+            print(">> Training model %s.[Stopped]" % self.model.name)
             if(self.args.scheduler == 'set'):
                 plt.semilogx(history['lr'], history['train_loss'])
                 plt.grid(True)

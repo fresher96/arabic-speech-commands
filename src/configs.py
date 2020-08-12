@@ -60,8 +60,8 @@ def set_defaults():
     parser.add_argument('--scheduler', type=str, default='set', help='auto | set | none')
 
     # model architecture
-    parser.add_argument('--model', type=str, default='LogisticRegression',
-                        help='LogisticRegression | CompressModel | ConvNet | ResNet')
+    parser.add_argument('--model', type=str, default='MatlabModel',
+                        help='LogisticRegression | CompressModel | ConvNet | ResNet | MatlabModel')
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--nlayer', type=int, default=8)
     parser.add_argument('--nchannel', type=int, default=19)
