@@ -112,8 +112,8 @@ def get_transform(args):
     else:
         train_transform = transforms.Compose([
             test_trasform,
-            torchaudio.transforms.TimeMasking(100),
-            torchaudio.transforms.FrequencyMasking(4),
+            # torchaudio.transforms.TimeMasking(100),
+            # torchaudio.transforms.FrequencyMasking(4),
         ])
 
     return {'train': train_transform, 'val': test_trasform, 'test': test_trasform}, silence_transform
