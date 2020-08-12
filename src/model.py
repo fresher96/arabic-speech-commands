@@ -166,6 +166,24 @@ class MatlabModel(nn.Module):
         softmaxLayer
         weightedClassificationLayer(classWeights)
     ];
+
+    !python main.py \
+        --comet_key 'bLjz3xx3gKDZwM7Hm0Kcgbpww' --comet_project 'arabic-commands' --comet_workspace 'fresher96' \
+        --data_root ../dataroot \
+        --debug -1 \
+        \
+        --features_name ta.logfbes \
+        --numcep 50 \
+        \
+        --weight_decay 0.0 \
+        --nepoch 75 \
+        --batchsize 128 \
+        --lr 3e-3 \
+        --optimizer adam \
+        --scheduler auto \
+        \
+        --model MatlabModel \
+        --dropout 0.2 \
     """
 
     def __init__(self, args):
