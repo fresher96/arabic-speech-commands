@@ -55,10 +55,11 @@ def set_defaults():
     parser.add_argument('--batchsize', type=int, default=32, help='input batch size')
     parser.add_argument('--metric', type=str, default='acc', help='')
     parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
-    parser.add_argument('--momentum', type=float, default=0.9, help='')
+    parser.add_argument('--momentum', type=float, default=0.0, help='')
     parser.add_argument('--beta1', type=float, default=0.9, help='')
     parser.add_argument('--optimizer', type=str, default='sgd', help='adam | sgd')
     parser.add_argument('--scheduler', type=str, default='set', help='auto | set | none')
+    parser.add_argument('--scheduler_factor', type=float, default=0.5, help='')
 
     # model architecture
     parser.add_argument('--model', type=str, default='ConvNet',
