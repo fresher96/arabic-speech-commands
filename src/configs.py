@@ -22,7 +22,8 @@ def set_defaults():
     parser.add_argument('--nsilence', type=int, default=-1, help='')
 
     # augmentations LogFBEs | MFCCs
-    parser.add_argument('--features_name', type=str, default='ta.MFCCs', help='LogFBEs | MFCCs | ta.MFCCs')
+    parser.add_argument('--features_name', type=str, default='ta.LogFBEs',
+                        help='LogFBEs | MFCCs | ta.MFCCs | ta.LogFBEs')
     parser.add_argument('--nfilt', type=int, default=40, help='')
     parser.add_argument('--numcep', type=int, default=13, help='')
     parser.add_argument('--winlen', type=float, default=0.025, help='')
@@ -60,11 +61,11 @@ def set_defaults():
     parser.add_argument('--scheduler', type=str, default='set', help='auto | set | none')
 
     # model architecture
-    parser.add_argument('--model', type=str, default='MatlabModel',
+    parser.add_argument('--model', type=str, default='ConvNet',
                         help='LogisticRegression | CompressModel | ConvNet | ResNet | MatlabModel')
     parser.add_argument('--dropout', type=float, default=0.5)
-    parser.add_argument('--nlayer', type=int, default=8)
-    parser.add_argument('--nchannel', type=int, default=19)
+    parser.add_argument('--nlayer', type=int, default=3)
+    parser.add_argument('--nchannel', type=int, default=8)
     parser.add_argument('--res_pool', type=tuple, default=(1, 1))
     parser.add_argument('--use_dilation', action='store_true', default=False)
 

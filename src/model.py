@@ -55,11 +55,15 @@ class ConvNet(nn.Module):
             block += [nn.ReLU(), nn.Dropout2d(args.dropout)];
             return nn.Sequential(*block);
 
+        init_fm = args.nchannel;
         self.conv = nn.Sequential();
-        for i in range(args.nlayer):
-            self.conv.add_module('conv_%d'%i, block(2**i, 2**(i+1), i != 0));
+        self.conv.add_module('conv_%d' % 0, block(1, init_fm, False));
 
-        self.fc = nn.Linear(2 ** args.nlayer, args.nclass);
+        for i in range(1, args.nlayer):
+            i -= 1
+            self.conv.add_module('conv_%d'%(i+1), block(2**i * init_fm, 2**(i+1) * init_fm, True));
+
+        self.fc = nn.Linear(2 ** (args.nlayer - 1) * init_fm, args.nclass);
 
     def forward(self, x):
         x = self.conv(x)

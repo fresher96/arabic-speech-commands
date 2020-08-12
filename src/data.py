@@ -60,10 +60,10 @@ class ASCDataset(torch.utils.data.Dataset):
 def get_transform(args):
 
     melkwargs = {
-        'n_fft': args.nfft,
-        'win_length': args.winlen,
-        'hop_length': args.winstep,
         'n_mels': args.nfilt,
+        'n_fft': args.nfft,
+        'win_length': int(args.winlen * args.signal_sr),
+        'hop_length': int(args.winstep * args.signal_sr),
     };
 
     args.signal_width = int(np.ceil((args.signal_len - args.winlen) / args.winstep) + 1)
@@ -92,7 +92,7 @@ def get_transform(args):
         log_offset = 1e-6;
         features = transforms.Compose([
             transforms.ToTensor(),
-            torchaudio.transforms.MelSpectrogram(sample_rate=args.signal_sr, n_mfcc=args.numcep),
+            torchaudio.transforms.MelSpectrogram(sample_rate=args.signal_sr, **melkwargs),
             transforms.Lambda(lambda t: torch.log(t + log_offset)),
         ]);
         args.nfeature = args.nfilt
