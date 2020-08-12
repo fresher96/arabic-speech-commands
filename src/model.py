@@ -50,11 +50,9 @@ class ConvNet(nn.Module):
         self.name = self.__class__.__name__
 
         def block(in_filters, out_filters, bn):
-            block = [nn.Conv2d(in_filters, out_filters, 3, bias=not bn),
-                     nn.ReLU(),
-                     nn.Dropout2d(args.dropout)]
-            if bn:
-                block.append(nn.BatchNorm2d(out_filters))
+            block = [nn.Conv2d(in_filters, out_filters, 3, bias=not bn)]
+            if bn: block.append(nn.BatchNorm2d(out_filters))
+            block += [nn.ReLU(), nn.Dropout2d(args.dropout)];
             return nn.Sequential(*block);
 
         self.conv = nn.Sequential();
