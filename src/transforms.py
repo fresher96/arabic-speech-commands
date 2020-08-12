@@ -169,3 +169,22 @@ class MFCCs(object):
     def __repr__(self):
         return self.__class__.__name__ + '()'
 
+
+
+class TimeShifting2():
+
+    def __init__(self, shift_min, shift_max):
+        self.shift_min = shift_min
+        self.shift_max = shift_max
+
+    def __call__(self, signal):
+        shift_rand = random.uniform(self.shift_min, self.shift_max)
+        num_pad = int(shift_rand * len(signal))
+        padding = torch.zeros(abs(num_pad))
+        if num_pad > 0:
+            return torch.cat((padding, signal[:-num_pad]))
+        elif num_pad < 0:
+            return torch.cat((signal[-num_pad:], padding))
+        return signal
+
+
