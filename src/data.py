@@ -135,7 +135,6 @@ def get_transform(args):
         torchaudio.transforms.TimeMasking(args.mask_time),
         torchaudio.transforms.TimeMasking(args.mask_time),
         torchaudio.transforms.FrequencyMasking(args.mask_freq),
-        torchaudio.transforms.FrequencyMasking(args.mask_freq),
     ])
 
     return {'train': train_transform, 'val': test_trasform, 'test': test_trasform}, silence_transform
