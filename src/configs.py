@@ -66,7 +66,7 @@ def set_defaults():
     parser.add_argument('--beta1', type=float, default=0.9, help='')
     parser.add_argument('--optimizer', type=str, default='sgd', help='adam | sgd')
     parser.add_argument('--scheduler', type=str, default='none', help='auto | set | none')
-    parser.add_argument('--scheduler_factor', type=float, default=0.5, help='')
+    parser.add_argument('--scheduler_factor', type=float, default=0.1, help='')
 
     # model architecture
     parser.add_argument('--model', type=str, default='ConvNet',
