@@ -211,3 +211,13 @@ class AddNoise2():
 
         return old_signal + silence * self.noise_vol
 
+
+class RandomApplyTransform():
+    def __init__(self, p, transform):
+        self.p = p
+        self.transform = transform
+
+    def __call__(self, signal):
+        if(random.random() < self.p):
+            signal = self.transform(signal);
+        return signal;
