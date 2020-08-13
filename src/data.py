@@ -109,10 +109,10 @@ def get_transform(args):
         args.nfeature = args.nfilt
         # args.signal_width = 81;
     else:
-        raise Exception('--features_name should be one of {LogFBEs | MFCCs | ta.mfcc}')
+        raise Exception('--features_name should be one of {LogFBEs | MFCCs | ta.MFCCs | ta.LogFBEs}')
 
 
-
+    # Composing transforms
     test_trasform = transforms.Compose([
         features,
         transforms.Lambda(lambda x: x.unsqueeze(0)),
@@ -126,35 +126,15 @@ def get_transform(args):
     args.signal_samples = int(args.signal_sr * args.signal_len)
     args.bkg_noise_path = 'background_noise'
 
-    noise_files, noise_probability_distribution = utils.get_noise_files(
-        os.path.join(args.data_root, args.bkg_noise_path), signal_sr=args.signal_sr)
-
-
-
-    if(args.use_augmentations):
-        train_transform = transforms.Compose([
-            transforms.TimeScaling(scale_min=args.scale_min, scale_max=args.scale_max),
-            transforms.TimeShifting(shift_min=args.shift_min, shift_max=args.shift_max),
-            transforms.AddNoise(noise_files, noise_probability_distribution, args.noise_vol,
-                                args.signal_samples, args.data_root, args.signal_sr),
-            test_trasform,
-        ])
-    else:
-        def debug(x):
-            print(x.size());
-            exit()
-            return x;
-
-        train_transform = transforms.Compose([
-            transforms.TimeShifting2(shift_min=args.shift_min, shift_max=args.shift_max),
-            transforms.RandomApplyTransform(p=args.p_transform, transform=transforms.AddNoise2(
-                os.path.join(args.data_root, args.bkg_noise_path),
-                args.noise_vol, args.signal_samples, args.signal_sr)),
-            test_trasform,
-            # transforms.Lambda(debug),
-            torchaudio.transforms.TimeMasking(args.mask_time),
-            torchaudio.transforms.FrequencyMasking(args.mask_freq),
-        ])
+    train_transform = transforms.Compose([
+        transforms.TimeShifting2(shift_min=args.shift_min, shift_max=args.shift_max),
+        transforms.RandomApplyTransform(p=args.p_transform, transform=transforms.AddNoise2(
+            os.path.join(args.data_root, args.bkg_noise_path),
+            args.noise_vol, args.signal_samples, args.signal_sr)),
+        test_trasform,
+        torchaudio.transforms.TimeMasking(args.mask_time),
+        torchaudio.transforms.FrequencyMasking(args.mask_freq),
+    ])
 
     return {'train': train_transform, 'val': test_trasform, 'test': test_trasform}, silence_transform
 

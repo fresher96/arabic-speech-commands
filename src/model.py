@@ -31,7 +31,7 @@ class CompressModel(nn.Module):
 
         self.input_shape = args.nfeature * args.signal_width
         self.dropout = nn.Dropout(p=args.dropout);
-        self.fc1 = nn.Linear(self.input_shape, 1)
+        self.fc1 = nn.Linear(self.input_shape, 1, bias=False)
         self.fc2 = nn.Linear(1, args.nclass)
 
     def forward(self, x):
@@ -172,25 +172,30 @@ class MatlabModel(nn.Module):
         --data_root ../dataroot \
         --debug -1 \
         \
-        --features_name ta.logfbes \
-        --numcep 50 \
+        --features_name ta.mfccs \
+        --nfilt 128 \
+        --numcep 64 \
         \
-        --weight_decay 0.0 \
-        --nepoch 75 \
+        --weight_decay 1e-3 \
+        --nepoch 100 \
         --batchsize 128 \
         --lr 3e-3 \
         --optimizer adam \
         --scheduler auto \
         \
         --model MatlabModel \
-        --dropout 0.2 \
+        --dropout 0.20 \
+        \
+        --p_transform 0.1 \
+        --mask_time 12 \
+        --mask_freq 8 \
     """
 
     def __init__(self, args):
         super().__init__()
         self.name = self.__class__.__name__;
 
-        numF = 12; # change to 40 or 41?
+        numF = args.nchannel; # change to 40 or 41?
 
         w = args.signal_width;
         w = (w - 1) // 2 + 1;
@@ -232,12 +237,10 @@ class MatlabModel(nn.Module):
             nn.Conv2d(in_channels=4 * numF, out_channels=4 * numF, kernel_size=3, padding=1),
             nn.BatchNorm2d(num_features=4 * numF),
             nn.ReLU(),
-
-
             nn.MaxPool2d(kernel_size=(1, w)),
-
-
             nn.Dropout2d(p=args.dropout),
+
+
             nn.Flatten(start_dim=1),
             nn.Linear(in_features=4 * numF * h * 1, out_features=args.nclass),
         );

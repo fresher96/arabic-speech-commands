@@ -34,7 +34,6 @@ def set_defaults():
     parser.add_argument('--ceplifter', type=int, default=22, help='')
 
     # augmentations 1
-    parser.add_argument('--use_augmentations', action='store_true', default=False)
     parser.add_argument('--scale_min', type=float, default=0.95, help='')
     parser.add_argument('--scale_max', type=float, default=1.1, help='')
     parser.add_argument('--shift_min', type=float, default=-0.2, help='')
@@ -65,7 +64,7 @@ def set_defaults():
     parser.add_argument('--momentum', type=float, default=0.0, help='')
     parser.add_argument('--beta1', type=float, default=0.9, help='')
     parser.add_argument('--optimizer', type=str, default='sgd', help='adam | sgd')
-    parser.add_argument('--scheduler', type=str, default='none', help='auto | set | none')
+    parser.add_argument('--scheduler', type=str, default='auto', help='auto | set | none')
     parser.add_argument('--scheduler_factor', type=float, default=0.1, help='')
 
     # model architecture
@@ -78,7 +77,6 @@ def set_defaults():
     parser.add_argument('--use_dilation', action='store_true', default=True)
 
     args, unknown = parser.parse_known_args()
-    # args = parser.parse_args();
     return args
 
 
