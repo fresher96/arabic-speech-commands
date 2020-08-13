@@ -140,14 +140,20 @@ def get_transform(args):
             test_trasform,
         ])
     else:
+        def debug(x):
+            print(x.size());
+            exit()
+            return x;
+
         train_transform = transforms.Compose([
             transforms.TimeShifting2(shift_min=args.shift_min, shift_max=args.shift_max),
             transforms.RandomApplyTransform(p=args.p_transform, transform=transforms.AddNoise2(
                 os.path.join(args.data_root, args.bkg_noise_path),
                 args.noise_vol, args.signal_samples, args.signal_sr)),
             test_trasform,
-            # torchaudio.transforms.TimeMasking(100),
-            # torchaudio.transforms.FrequencyMasking(4),
+            # transforms.Lambda(debug),
+            torchaudio.transforms.TimeMasking(args.mask_time),
+            torchaudio.transforms.FrequencyMasking(args.mask_freq),
         ])
 
     return {'train': train_transform, 'val': test_trasform, 'test': test_trasform}, silence_transform
