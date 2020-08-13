@@ -42,8 +42,8 @@ def set_defaults():
 
     # augmentations 2
     parser.add_argument('--p_transform', type=float, default=0.2)
-    parser.add_argument('--mask_time', type=int, default=6)
-    parser.add_argument('--mask_freq', type=int, default=6)
+    parser.add_argument('--mask_time', type=int, default=12)
+    parser.add_argument('--mask_freq', type=int, default=8)
 
 
     # experiment configs

@@ -133,7 +133,6 @@ def get_transform(args):
             args.noise_vol, args.signal_samples, args.signal_sr)),
         test_trasform,
         torchaudio.transforms.TimeMasking(args.mask_time),
-        torchaudio.transforms.TimeMasking(args.mask_time),
         torchaudio.transforms.FrequencyMasking(args.mask_freq),
     ])
 
