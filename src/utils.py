@@ -55,21 +55,27 @@ def split(args, validation_part=0.2, test_part=0.2):
     dataset_path = os.path.join(args.data_root, 'dataset')
     dataset_files = get_dataset_files(dataset_path)
     training_files, validation_files, test_files = [], [], []
+    permutation = None
     for class_name, files_list in dataset_files.items():
         files_lists = group_by_person(files_list)
+        if permutation is None:
+            permutation = np.random.permutation(len(files_lists))
         num_test = ceil(test_part * len(files_lists))
         num_validation = ceil(validation_part * len(files_lists))
         for i in range(num_test):
-            for file_name in files_lists[i]:
-                file_path = os.path.join('dataset', class_name, file_name)
+            idx = permutation[i]
+            for file_name in files_lists[idx]:
+                file_path = os.path.join('dataset', class_name, file_name).replace("\\", "/")
                 test_files.append((file_path, class_name))
         for i in range(num_test, num_test + num_validation):
-            for file_name in files_lists[i]:
-                file_path = os.path.join('dataset', class_name, file_name)
+            idx = permutation[i]
+            for file_name in files_lists[idx]:
+                file_path = os.path.join('dataset', class_name, file_name).replace("\\", "/")
                 validation_files.append((file_path, class_name))
         for i in range(num_test + num_validation, len(files_lists)):
-            for file_name in files_lists[i]:
-                file_path = os.path.join('dataset', class_name, file_name)
+            idx = permutation[i]
+            for file_name in files_lists[idx]:
+                file_path = os.path.join('dataset', class_name, file_name).replace("\\", "/")
                 training_files.append((file_path, class_name))
     return {'train': training_files, 'val': validation_files, 'test': test_files}
 
