@@ -75,7 +75,7 @@ def set_defaults():
     parser.add_argument('--nlayer', type=int, default=3)
     parser.add_argument('--nchannel', type=int, default=8)
     parser.add_argument('--res_pool', type=tuple, default=(1, 1))
-    parser.add_argument('--use_dilation', action='store_true', default=False)
+    parser.add_argument('--use_dilation', action='store_true', default=True)
 
     args, unknown = parser.parse_known_args()
     # args = parser.parse_args();

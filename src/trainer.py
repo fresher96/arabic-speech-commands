@@ -20,7 +20,7 @@ class ModelTrainer():
         self.args = args
         self.data = dataloader
         self.metric = args.metric;
-        args.frq_log = len(dataloader['train']) // args.frq_log;
+        self.frq_log = len(dataloader['train']) // args.frq_log;
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         model.to(self.device);
@@ -78,7 +78,7 @@ class ModelTrainer():
             self.experiment.log_metric('batch_loss', loss, comet_step, epoch);
             self.experiment.log_metric('batch_acc', acc, comet_step, epoch);
 
-            if (batch_idx + 1) % self.args.frq_log == 0:
+            if (batch_idx + 1) % self.frq_log == 0:
                 self.experiment.log_metric('log_loss', loss, comet_step, epoch);
                 self.experiment.log_metric('log_acc', acc, comet_step, epoch);
                 print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tAcc: {:.2f}%'.format(
@@ -99,6 +99,7 @@ class ModelTrainer():
 
     def train(self):
 
+        self.log_cmd();
         best = -1
         history = {'lr': [], 'train_loss': []};
 
@@ -130,12 +131,13 @@ class ModelTrainer():
                     self.scheduler.step(train_res['loss']);
         finally:
             print(">> Training model %s.[Stopped]" % self.model.name)
+            self.experiment.log_asset_folder(os.path.join(self.args.outf, self.args.name, 'weights'),
+                                             step=epoch, log_file_name=False, recursive=False)
             if(self.args.scheduler == 'set'):
                 plt.semilogx(history['lr'], history['train_loss'])
                 plt.grid(True)
                 self.experiment.log_figure(figure=plt)
                 plt.show();
-
 
     def val(self, val_loader, comet_offset=-1, epoch=-1):
         self.model.eval()
@@ -182,16 +184,32 @@ class ModelTrainer():
             res = self.val(self.data['test']);
 
 
+    def log_cmd(self):
+        d = vars(self.args);
+        cmd = '!python main.py \\\n';
+        tab = '    ';
+
+        for k, v in d.items():
+            if(v is None or v == '' or (isinstance(v, (bool)) and v == False) ):
+                continue;
+
+            if(isinstance(v, (bool))):
+                arg = '--{} \\\n'.format(k)
+            else:
+                arg = '--{} {} \\\n'.format(k, v)
+
+            cmd = cmd + tab + arg;
+
+        # print(cmd);
+        self.experiment.log_text(cmd);
+
     def save_weights(self, epoch:int):
 
         weight_dir = os.path.join(self.args.outf, self.args.name, 'weights')
         if not os.path.exists(weight_dir): os.makedirs(weight_dir)
 
-        torch.save({'epoch': epoch, 'state_dict': self.model.state_dict()}, os.path.join(weight_dir, 'model.pth'))
-
-        self.experiment.log_asset_folder(os.path.join(self.args.outf, self.args.name, 'weights'),
-                                         step=None, log_file_name=False, recursive=False)
-
+        torch.save({'epoch': epoch, 'state_dict': self.model.state_dict()},
+                   os.path.join(weight_dir, 'model.pth'))
 
     def load_weights(self):
 

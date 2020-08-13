@@ -123,7 +123,7 @@ def get_transform(args):
         test_trasform,
     ])
 
-    args.signal_samples = args.signal_sr * args.signal_len
+    args.signal_samples = int(args.signal_sr * args.signal_len)
     args.bkg_noise_path = 'background_noise'
 
     noise_files, noise_probability_distribution = utils.get_noise_files(
