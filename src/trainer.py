@@ -36,7 +36,7 @@ class ModelTrainer():
             self.scheduler = optim.lr_scheduler.LambdaLR(self.optimizer, lambda epoch: 10**(epoch/args.scheduler_factor))
         elif(args.scheduler == 'auto'):
             self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, mode='min',
-                                                                  factor=args.scheduler_factor, patience=7,
+                                                                  factor=args.scheduler_factor, patience=5,
                                                                   verbose=True, threshold=0.0001, threshold_mode='rel',
                                                                   cooldown=0, min_lr=0, eps=1e-08);
 
