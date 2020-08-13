@@ -132,7 +132,7 @@ class ModelTrainer():
         finally:
             print(">> Training model %s.[Stopped]" % self.model.name)
             self.experiment.log_asset_folder(os.path.join(self.args.outf, self.args.name, 'weights'),
-                                             step=epoch, log_file_name=False, recursive=False)
+                                             step=None, log_file_name=False, recursive=False)
             if(self.args.scheduler == 'set'):
                 plt.semilogx(history['lr'], history['train_loss'])
                 plt.grid(True)
