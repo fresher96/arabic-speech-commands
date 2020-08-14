@@ -223,3 +223,12 @@ class ModelTrainer():
         weights_g = torch.load(path_g, map_location=self.device)['state_dict']
         self.model.load_state_dict(weights_g)
         print('   Done.')
+
+    def predict(self, x):
+        x = torch.from_numpy(x).float();
+        x = self.data['test'].dataset.transform(x);
+        x = x.unsqueeze(0);
+        x = self.model(x);
+        x = F.softmax(x);
+        x = x.detach().numpy();
+        return x;
