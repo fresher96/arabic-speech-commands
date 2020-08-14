@@ -76,6 +76,10 @@ def set_defaults():
     parser.add_argument('--res_pool', type=int, default=[1, 1], nargs=2)
     parser.add_argument('--use_dilation', action='store_true', default=True)
 
+    # streaming audio
+    parser.add_argument('--p_threshold', type=float, default=0.7)
+    parser.add_argument('--n_chunks', type=int, default=4)
+
     args, unknown = parser.parse_known_args()
     return args
 
