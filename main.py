@@ -14,6 +14,8 @@ def load_model(args):
 def run():
 
     args = get_args();
+    print(args.res_pool)
+    exit();
 
     dataloader = get_dataloader(args);
 
