@@ -220,6 +220,6 @@ class ModelTrainer():
             path_g = os.path.join(weight_dir, 'model.pth')
 
         print('>> Loading weights...')
-        weights_g = torch.load(path_g)['state_dict']
+        weights_g = torch.load(path_g, map_location=self.device)['state_dict']
         self.model.load_state_dict(weights_g)
         print('   Done.')

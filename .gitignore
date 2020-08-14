@@ -3,6 +3,7 @@ output/
 Arabic_Speech_Commands_Dataset/
 0test.py
 0test.ipynb
+src/0streaming_audio.py
 
 
 
