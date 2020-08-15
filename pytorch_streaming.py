@@ -61,7 +61,7 @@ class StreamingAudio:
         x = self.signal
         # Predict the received speech command
         prediction = self.model.predict(x)[0]
-        print(prediction)
+        # print(prediction.max())
 
         res_idx = self.silence_idx if prediction.max() < self.args.p_threshold else prediction.argmax()
         self.predictions = np.concatenate((self.predictions[1:], np.array(res_idx).reshape(1)))

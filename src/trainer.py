@@ -225,10 +225,12 @@ class ModelTrainer():
         print('   Done.')
 
     def predict(self, x):
-        x = torch.from_numpy(x).float();
-        x = self.data['test'].dataset.transform(x);
-        x = x.unsqueeze(0);
-        x = self.model(x);
-        x = F.softmax(x);
-        x = x.detach().numpy();
+        self.model.eval();
+        with torch.no_grad():
+            x = torch.from_numpy(x).float();
+            x = self.data['test'].dataset.transform(x);
+            x = x.unsqueeze(0);
+            x = self.model(x);
+            x = F.softmax(x);
+            x = x.numpy();
         return x;
