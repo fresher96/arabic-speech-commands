@@ -82,7 +82,7 @@ def set_defaults():
     parser.add_argument('--p_threshold', type=float, default=0.7)
     parser.add_argument('--n_chunks', type=int, default=4)
 
-    args, unknown = parser.parse_known_args()
+    args = parser.parse_args()
     return args
 
 
