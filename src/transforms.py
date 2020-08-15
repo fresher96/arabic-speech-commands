@@ -65,7 +65,21 @@ class ToTensor(object):
         return self.__class__.__name__ + '()'
 
 
-class AddNoise(object):
+class AmplitudeScaling:
+
+    def __init__(self, alpha_min, alpha_max):
+        self.alpha_min = alpha_min
+        self.alpha_max = alpha_max
+
+    def __call__(self, signal):
+        alpha = random.uniform(self.alpha_min, self.alpha_max)
+        return np.array(alpha * signal, dtype=np.int16)
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
+
+
+class AddNoise:
 
     def __init__(self, noise_files, noise_probability_distribution, volume_rate, signal_samples, data_root, signal_sr):
         self.noise_files = noise_files
@@ -85,7 +99,7 @@ class AddNoise(object):
         return self.__class__.__name__ + '()'
 
 
-class TimeShifting(object):
+class TimeShifting:
 
     def __init__(self, shift_min, shift_max):
         self.shift_min = shift_min
@@ -105,7 +119,7 @@ class TimeShifting(object):
         return self.__class__.__name__ + '()'
 
 
-class TimeScaling(object):
+class TimeScaling:
 
     def __init__(self, scale_min, scale_max):
         self.scale_min = scale_min
@@ -129,7 +143,7 @@ class TimeScaling(object):
         return self.__class__.__name__ + '()'
 
 
-class LogFBEs(object):
+class LogFBEs:
 
     def __init__(self, samplerate, winlen, winstep, nfilt, nfft, preemph):
         self.samplerate = samplerate
@@ -149,7 +163,7 @@ class LogFBEs(object):
         return self.__class__.__name__ + '()'
 
 
-class MFCCs(object):
+class MFCCs:
 
     def __init__(self, samplerate, winlen, winstep, numcep, nfilt, nfft, preemph, ceplifter):
         self.samplerate = samplerate
@@ -171,8 +185,7 @@ class MFCCs(object):
         return self.__class__.__name__ + '()'
 
 
-
-class TimeShifting2():
+class TimeShifting2:
 
     def __init__(self, shift_min, shift_max):
         self.shift_min = shift_min
@@ -189,7 +202,7 @@ class TimeShifting2():
         return signal
 
 
-class AddNoise2():
+class AddNoise2:
 
     def __init__(self, noise_pkg, noise_vol, signal_samples, signal_sr):
         self.noise_pkg = noise_pkg
