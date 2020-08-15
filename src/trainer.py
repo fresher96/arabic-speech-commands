@@ -81,9 +81,8 @@ class ModelTrainer():
             if (batch_idx + 1) % self.frq_log == 0:
                 self.experiment.log_metric('log_loss', loss, comet_step, epoch);
                 self.experiment.log_metric('log_acc', acc, comet_step, epoch);
-                print('Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tAcc: {:.2f}%'.format(
-                    epoch + 1, (batch_idx + 1) * len(data), len(train_loader.dataset),
-                           100. * (batch_idx + 1) / len(train_loader), loss, acc))
+                print('Epoch: {} [{}/{}]\tLoss: {:.6f}\tAcc: {:.2f}%'.format(
+                    epoch + 1, (batch_idx + 1) * len(data), len(train_loader.dataset), loss, acc))
 
         train_loss /= len(train_loader.dataset)
         acc = 100. * correct / len(train_loader.dataset);

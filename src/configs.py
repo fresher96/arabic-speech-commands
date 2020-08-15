@@ -39,7 +39,7 @@ def set_defaults():
     parser.add_argument('--shift_min', type=float, default=-0.2, help='')
     parser.add_argument('--shift_max', type=float, default=0.2, help='')
     parser.add_argument('--noise_vol', type=float, default=0.5, help='')
-    parser.add_argument('--alpha_min', type=float, default=0.75, help='')
+    parser.add_argument('--alpha_min', type=float, default=0.70, help='')
     parser.add_argument('--alpha_max', type=float, default=1.00, help='')
 
     # augmentations 2

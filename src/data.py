@@ -127,6 +127,7 @@ def get_transform(args):
     args.bkg_noise_path = 'background_noise'
 
     train_transform = transforms.Compose([
+        transforms.Lambda(lambda x: x * random.uniform(args.alpha_min, args.alpha_max)),
         transforms.TimeShifting2(shift_min=args.shift_min, shift_max=args.shift_max),
         transforms.RandomApplyTransform(p=args.p_transform, transform=transforms.AddNoise2(
             os.path.join(args.data_root, args.bkg_noise_path),
