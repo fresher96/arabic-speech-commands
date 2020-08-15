@@ -242,8 +242,8 @@ class MatlabModel(nn.Module):
 
 
             nn.Flatten(start_dim=1),
-            nn.Linear(in_features=4 * numF * h * 1, out_features=5, bias=False),
-            nn.Linear(in_features=5, out_features=args.nclass),
+            nn.Linear(in_features=4 * numF * h * 1, out_features=10, bias=False),
+            nn.Linear(in_features=10, out_features=args.nclass),
         );
 
     def forward(self, x):
