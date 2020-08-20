@@ -63,7 +63,11 @@ class ConvNet(nn.Module):
             i -= 1
             self.conv.add_module('conv_%d'%(i+1), block(2**i * init_fm, 2**(i+1) * init_fm, True));
 
-        self.fc = nn.Linear(2 ** (args.nlayer - 1) * init_fm, args.nclass);
+        # self.fc = nn.Linear(2 ** (args.nlayer - 1) * init_fm, args.nclass);
+        self.fc = nn.Sequential(
+            nn.Linear(2 ** (args.nlayer - 1) * init_fm, 10, bias=False),
+            nn.Linear(10, args.nclass)
+        );
 
     def forward(self, x):
         x = self.conv(x)

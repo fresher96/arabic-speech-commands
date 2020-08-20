@@ -70,7 +70,7 @@ def set_defaults():
     parser.add_argument('--scheduler_factor', type=float, default=0.1, help='')
 
     # model architecture
-    parser.add_argument('--model', type=str, default='LogisticRegression',
+    parser.add_argument('--model', type=str, default='ConvNet',
                         help='LogisticRegression | CompressModel | ConvNet | ResNet | MatlabModel')
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--nlayer', type=int, default=3)
