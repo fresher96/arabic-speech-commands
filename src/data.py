@@ -36,6 +36,7 @@ class ASCDataset(torch.utils.data.Dataset):
 
         self.nfl, self.npd = utils.get_noise_files(noise_pkg, signal_sr)
         self.noise_pkg = noise_pkg;
+        
 
     def load_silence(self):
         file_name = np.random.choice(self.nfl, p=self.npd)
