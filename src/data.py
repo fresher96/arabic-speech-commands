@@ -36,12 +36,24 @@ class ASCDataset(torch.utils.data.Dataset):
 
         self.nfl, self.npd = utils.get_noise_files(noise_pkg, signal_sr)
         self.noise_pkg = noise_pkg;
-        
+
+        self.cache = [];
+        for idx in range(len(self.audio_files)):
+            file_path = os.path.join(self.data_root, self.audio_files[idx])
+            x = self.load_path(file_path)
+            self.cache.append(x);
+
+        self.s_cache = {};
+        for file_name in self.nfl:
+            file_path = os.path.join(self.noise_pkg, file_name)
+            signal = self.load_path(file_path)
+            self.s_cache[file_name] = signal
 
     def load_silence(self):
         file_name = np.random.choice(self.nfl, p=self.npd)
-        file_path = os.path.join(self.noise_pkg, file_name)
-        signal = self.load_path(file_path)
+        # file_path = os.path.join(self.noise_pkg, file_name)
+        # signal = self.load_path(file_path)
+        signal = self.s_cache[file_name]
         start_index = np.random.randint(0, signal.size()[0] - self.signal_samples)
         silence = signal[start_index : start_index + self.signal_samples]
 
@@ -54,8 +66,9 @@ class ASCDataset(torch.utils.data.Dataset):
         return x
 
     def load_audio(self, idx):
-        file_path = os.path.join(self.data_root, self.audio_files[idx])
-        x = self.load_path(file_path);
+        # file_path = os.path.join(self.data_root, self.audio_files[idx])
+        # x = self.load_path(file_path)
+        x = self.cache[idx]
         tensor = self.transform(x)
         return tensor
 
