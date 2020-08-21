@@ -224,12 +224,13 @@ class ModelTrainer():
         print('   Done.')
 
     def predict(self, x):
+        x = x / 2**15;
         self.model.eval();
         with torch.no_grad():
             x = torch.from_numpy(x).float();
             x = self.data['test'].dataset.transform(x);
             x = x.unsqueeze(0);
             x = self.model(x);
-            x = F.softmax(x);
+            x = F.softmax(x, dim=1);
             x = x.numpy();
         return x;

@@ -59,6 +59,7 @@ class StreamingAudio:
         self.signal = np.concatenate((self.signal[self.chunk_size:], chunk_signal))
 
         x = self.signal
+        # print(x)
         # Predict the received speech command
         prediction = self.model.predict(x)[0]
         # print(prediction.max())
