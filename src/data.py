@@ -133,7 +133,7 @@ def get_transform(args):
 
     train_transform = transforms.Compose([
         transforms.TimeShifting2(shift_min=args.shift_min, shift_max=args.shift_max),
-        transforms.RandomApplyTransform(p=args.p_transform, transform=transforms.AddNoise2(
+        transforms.RandomApplyTransform(p=args.p_transform, transform=transforms.AddNoise3(
             os.path.join(args.data_root, args.bkg_noise_path),
             args.noise_vol, args.signal_samples, args.signal_sr)),
         test_trasform,

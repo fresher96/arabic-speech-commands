@@ -224,6 +224,35 @@ class AddNoise2:
 
         return old_signal + silence * self.noise_vol
 
+class AddNoise3:
+
+    def __init__(self, noise_pkg, noise_vol, signal_samples, signal_sr):
+        self.noise_pkg = noise_pkg
+        self.nfl, self.npd = get_noise_files(noise_pkg, signal_sr)
+        self.noise_vol = noise_vol
+        self.signal_samples = signal_samples
+
+        self.cache = {};
+        for file_name in self.nfl:
+            file_path = os.path.join(self.noise_pkg, file_name)
+            signal = self.load_path(file_path)
+            self.cache[file_name] = signal
+
+    def load_path(self, path):
+        x, sr = torchaudio.load(path)
+        x = x.squeeze()
+        return x
+
+    def __call__(self, old_signal):
+        file_name = np.random.choice(self.nfl, p=self.npd)
+        # file_path = os.path.join(self.noise_pkg, file_name)
+        # signal = self.load_path(file_path)
+        signal = self.cache[file_name];
+        start_index = np.random.randint(0, signal.size()[0] - self.signal_samples)
+        silence = signal[start_index : start_index + self.signal_samples]
+
+        return old_signal + silence * self.noise_vol
+
 
 class RandomApplyTransform():
     def __init__(self, p, transform):
