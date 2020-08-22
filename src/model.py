@@ -52,7 +52,7 @@ class ConvNet(nn.Module):
         def block(in_filters, out_filters, bn):
             block = [nn.Conv2d(in_filters, out_filters, 3, bias=not bn)]
             if bn: block.append(nn.BatchNorm2d(out_filters))
-            block += [nn.ReLU(), nn.Dropout2d(args.dropout)];
+            block += [nn.ReLU()];
             return nn.Sequential(*block);
 
         init_fm = args.nchannel;
@@ -63,10 +63,11 @@ class ConvNet(nn.Module):
             i -= 1
             self.conv.add_module('conv_%d'%(i+1), block(2**i * init_fm, 2**(i+1) * init_fm, True));
 
-        # self.fc = nn.Linear(2 ** (args.nlayer - 1) * init_fm, args.nclass);
         self.fc = nn.Sequential(
-            nn.Linear(2 ** (args.nlayer - 1) * init_fm, 10, bias=False),
-            nn.Linear(10, args.nclass)
+            # nn.Linear(2 ** (args.nlayer - 1) * init_fm, 10, bias=False),
+            # nn.Linear(10, args.nclass),
+            nn.Dropout(p=args.dropout),
+            nn.Linear(2 ** (args.nlayer - 1) * init_fm, args.nclass),
         );
 
     def forward(self, x):
