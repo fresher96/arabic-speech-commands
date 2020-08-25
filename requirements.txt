@@ -6,3 +6,4 @@ comet_ml
 torchaudio
 librosa
 pyaudio
+matplotlib
