@@ -3,9 +3,9 @@ import numpy as np
 import random
 import torchaudio
 
-from utils import *
+from src.utils import *
 from python_speech_features import mfcc, logfbank
-from load import load_silence
+from src.load import load_silence
 from librosa.effects import time_stretch
 
 
