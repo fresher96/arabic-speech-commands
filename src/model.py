@@ -30,15 +30,45 @@ class CompressModel(nn.Module):
         self.name = self.__class__.__name__
 
         self.input_shape = args.nfeature * args.signal_width
+        self.h = args.nchannel
+
         self.dropout = nn.Dropout(p=args.dropout);
-        self.fc1 = nn.Linear(self.input_shape, 1, bias=False)
-        self.fc2 = nn.Linear(1, args.nclass)
+        self.fc1 = nn.Linear(self.input_shape, self.h, bias=False)
+        self.fc2 = nn.Linear(self.h, args.nclass)
 
     def forward(self, x):
         x = x.view(-1, self.input_shape)
         x = self.dropout(x);
         x = self.fc1(x)
         x = self.fc2(x)
+        return x
+
+
+class DNN(nn.Module):
+
+    def __init__(self, args):
+        super(DNN, self).__init__()
+
+        self.name = self.__class__.__name__
+
+        self.input_shape = args.nfeature * args.signal_width
+        self.h = args.nchannel
+        self.l = args.nlayer
+
+        self.dropout = nn.Dropout(p=args.dropout);
+        self.layers = nn.Sequential()
+
+        fin = self.input_shape
+        for i in range(self.l):
+            fout = args.nclass if i == self.l - 1 else self.h
+            self.layers.add_module('l_%02d'%i, nn.Linear(fin, fout))
+            if(i != self.l - 1): self.layers.add_module('a_%02d'%i, nn.ReLU())
+            fin = fout
+
+    def forward(self, x):
+        x = x.view(-1, self.input_shape)
+        x = self.dropout(x)
+        x = self.layers(x)
         return x
 
 
@@ -273,7 +303,7 @@ class AbdModel(nn.Module):
             nn.Dropout2d(p=args.dropout),
 
             nn.Flatten(start_dim=1),
-            nn.Linear(in_features=args.nchannel * args.nfeature/2 * args.signal_width/2, out_features=args.nclass),
+            nn.Linear(in_features=args.nchannel * (args.nfeature//2) * (args.signal_width//2), out_features=args.nclass),
         )
 
     def forward(self, x):
