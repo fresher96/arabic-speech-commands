@@ -254,3 +254,28 @@ class MatlabModel(nn.Module):
 
     def forward(self, x):
         return self.layers(x);
+
+
+
+class AbdModel(nn.Module):
+
+    def __init__(self, args):
+        super().__init__()
+        self.name = self.__class__.__name__;
+
+        # input dims: batchsize | channels = 1 | height = args.nfeature | width = args.signal_width
+        self.layers = nn.Sequential(
+            nn.Conv2d(in_channels=1, out_channels=args.nchannel, kernel_size=3, padding=1),
+            nn.BatchNorm2d(num_features=args.nchannel),
+            nn.ReLU(),
+
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Dropout2d(p=args.dropout),
+
+            nn.Flatten(start_dim=1),
+            nn.Linear(in_features=args.nchannel * args.nfeature/2 * args.signal_width/2, out_features=args.nclass),
+        )
+
+    def forward(self, x):
+        return self.layers(x)
+

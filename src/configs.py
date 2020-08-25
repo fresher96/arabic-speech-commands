@@ -23,7 +23,7 @@ def set_defaults():
     parser.add_argument('--silence_vol', type=float, default=0.5, help='')
 
     # augmentations LogFBEs | MFCCs
-    parser.add_argument('--features_name', type=str, default='ta.mfccs',
+    parser.add_argument('--features_name', type=str, default='ta.MFCCs',
                         help='LogFBEs | MFCCs | ta.MFCCs | ta.LogFBEs')
     parser.add_argument('--nfilt', type=int, default=40, help='')
     parser.add_argument('--numcep', type=int, default=13, help='')

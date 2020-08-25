@@ -111,7 +111,6 @@ def get_transform(args):
         args.signal_width = int(np.ceil((args.signal_len - args.winlen) / args.winstep) + 1)
     elif args.features_name.lower() == 'ta.mfccs':
         features = transforms.Compose([
-            # transforms.ToTensor(),
             torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep, melkwargs=melkwargs),
         ]);
         args.nfeature = args.numcep
@@ -120,7 +119,6 @@ def get_transform(args):
     elif args.features_name.lower() == 'ta.logfbes':
         log_offset = 1e-6;
         features = transforms.Compose([
-            # transforms.ToTensor(),
             torchaudio.transforms.MelSpectrogram(sample_rate=args.signal_sr, **melkwargs),
             transforms.Lambda(lambda t: torch.log(t + log_offset)),
         ]);
@@ -144,6 +142,10 @@ def get_transform(args):
 
     args.signal_samples = int(args.signal_sr * args.signal_len)
     args.bkg_noise_path = 'background_noise'
+
+    def debug(x):
+        print(x.size());
+        return x;
 
     train_transform = transforms.Compose([
         transforms.TimeShifting2(shift_min=args.shift_min, shift_max=args.shift_max),
