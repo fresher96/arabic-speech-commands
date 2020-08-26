@@ -111,7 +111,7 @@ def get_transform(args):
         args.signal_width = int(np.ceil((args.signal_len - args.winlen) / args.winstep) + 1)
     elif args.features_name.lower() == 'ta.mfccs':
         features = transforms.Compose([
-            torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep, melkwargs=melkwargs),
+            torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep, log_mels=True, melkwargs=melkwargs),
         ]);
         args.nfeature = args.numcep
         args.signal_width = 1 + args.signal_samples // melkwargs['hop_length']

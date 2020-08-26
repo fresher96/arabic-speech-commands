@@ -11,7 +11,7 @@ def plot(args, spectrogram, mel_spectrogram, mfcc, num_frames):
     plt.subplots_adjust(left=0.08, right=1.1, bottom=0.08, top=0.95, hspace=0.75)
 
     plt.subplot(311)
-    img = plt.imshow(20 * spectrogram.log10()[0, :, :].numpy(), origin='lower', aspect='auto')
+    img = plt.imshow(np.log(spectrogram[0, :, :].numpy()), origin='lower', aspect='auto')
     plt.colorbar(img)
     plt.title('Spectrogram')
     plt.xlabel('Time (s)')
@@ -22,7 +22,7 @@ def plot(args, spectrogram, mel_spectrogram, mfcc, num_frames):
     plt.yticks(y_ticks, (np.arange(0, int(args.signal_sr / 2) + 1, step=1000) / 1000).astype(int))
 
     plt.subplot(312)
-    img = plt.imshow(20 * np.log10(mel_spectrogram[0, :, :].numpy() + 1e-9), origin='lower', aspect='auto')
+    img = plt.imshow(np.log(mel_spectrogram[0, :, :].numpy()), origin='lower', aspect='auto')
     plt.colorbar(img)
     plt.title('Log Filterbank Energies (LogFBEs)')
     plt.xlabel('Time (s)')
