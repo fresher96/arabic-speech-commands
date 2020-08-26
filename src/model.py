@@ -315,15 +315,43 @@ class AbdModel(nn.Module):
 
             nn.Flatten(start_dim=1),
 
+            # nn.Linear(in_features=128 * (args.nfeature//16) * (args.signal_width//16), out_features=args.nclass),
+            # nn.ReLU(),
+            # nn.Linear(in_features=256, out_features=128),
+            # nn.ReLU(),
+            # nn.Linear(in_features=128, out_features=64),
+            # nn.ReLU(),
+            # nn.Linear(in_features=64, out_features=args.nclass),
+
             nn.Linear(in_features=128 * (args.nfeature//16) * (args.signal_width//16), out_features=256),
             nn.ReLU(),
-            nn.Linear(in_features=256, out_features=128),
-            nn.ReLU(),
-            nn.Linear(in_features=128, out_features=64),
-            nn.ReLU(),
-            nn.Linear(in_features=64, out_features=args.nclass),
+            nn.Linear(in_features=256, out_features=args.nclass),
         )
 
     def forward(self, x):
         return self.layers(x)
 
+
+
+class LSTM(nn.Module):
+
+    def __init__(self, args):
+        super().__init__()
+        self.name = self.__class__.__name__;
+
+        frq = args.nfeature
+        tim = args.signal_width
+
+        # input dims: batchsize | channels = 1 | height = args.nfeature | width = args.signal_width
+        self.layers = nn.Sequential(
+            nn.LSTM(input_size=args.nfeature, hidden_size=128, num_layers=2, batch_first=True),
+            nn.Dropout2d(p=0.5),
+
+            nn.Flatten(start_dim=1),
+            nn.Linear(in_features=64, out_features=args.nclass),
+        )
+
+    def forward(self, x):
+        x = x.unsqueeze(1)
+        x = x.permute(0, 2, 1)
+        return self.layers(x)
