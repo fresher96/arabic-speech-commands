@@ -1,17 +1,28 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
 from configs import get_args
-from load import load_data
-from transforms import LogFBEs, MFCCs
+import torchaudio
 
 
-def plot(logfbank_features, mfcc_features, num_frames):
+def plot(args, spectrogram, mel_spectrogram, mfcc, num_frames):
     plt.figure(13, figsize=(13.5, 6.5))
     plt.subplots_adjust(left=0.08, right=1.1, bottom=0.08, top=0.95, hspace=0.75)
 
-    plt.subplot(211)
-    img = plt.imshow(logfbank_features.T, origin='lower', aspect='auto')
+    plt.subplot(311)
+    img = plt.imshow(20 * spectrogram.log10()[0, :, :].numpy(), origin='lower', aspect='auto')
+    plt.colorbar(img)
+    plt.title('Spectrogram')
+    plt.xlabel('Time (s)')
+    plt.xlim(0, num_frames - 1)
+    plt.xticks(np.linspace(0, num_frames - 1, 6), np.round(np.arange(0, 1.1, 0.2), decimals=1))
+    plt.ylabel('Frequency (KHz)')
+    y_ticks = np.linspace(0, args.nfft / 2 + 1, (int(args.signal_sr / 2000) + 1))
+    plt.yticks(y_ticks, (np.arange(0, int(args.signal_sr / 2) + 1, step=1000) / 1000).astype(int))
+
+    plt.subplot(312)
+    img = plt.imshow(20 * np.log10(mel_spectrogram[0, :, :].numpy() + 1e-9), origin='lower', aspect='auto')
     plt.colorbar(img)
     plt.title('Log Filterbank Energies (LogFBEs)')
     plt.xlabel('Time (s)')
@@ -19,15 +30,15 @@ def plot(logfbank_features, mfcc_features, num_frames):
     plt.xticks(np.linspace(0, num_frames - 1, 6), np.round(np.arange(0, 1.1, 0.2), decimals=1))
     plt.ylabel('Filter index')
 
-    plt.subplot(212)
-    img = plt.imshow(mfcc_features.T, origin='lower', aspect='auto')
+    plt.subplot(313)
+    img = plt.imshow(mfcc[0, 1:, :].numpy(), origin='lower', aspect='auto')
     plt.colorbar(img)
     plt.title('Mel-Frequency Cepstral Coefficients (MFCCs)')
     plt.xlabel('Time (s)')
     plt.xlim(0, num_frames - 1)
     plt.xticks(np.linspace(0, num_frames - 1, 6), np.round(np.arange(0, 1.1, 0.2), decimals=1))
     plt.ylabel('Cepstrum index')
-    y_ticks = np.arange(0, mfcc_features.shape[1] - 1, step=2)
+    y_ticks = np.arange(0, mfcc.size()[1] - 1, step=2)
     plt.yticks(y_ticks, y_ticks + 1)
     plt.savefig('../output/LogFBEs and MFCCs.png', bbox_inches='tight')
 
@@ -37,22 +48,38 @@ def main():
 
     class_name = 'rotate'
     file_name = '00000020_NO_07.wav'
-    signal_samples = args.signal_len * args.signal_sr
+    signal_path = os.path.join(args.data_root, 'dataset', class_name, file_name)
 
-    # Read a sample from the dataset for testing
-    signal = load_data(class_name, file_name, signal_samples, args.data_root, args.signal_sr)
+    # # Read a sample from the dataset for testing
+    # signal = load_data(class_name, file_name, signal_samples, args.data_root, args.signal_sr)
 
-    logfbank = LogFBEs(samplerate=args.signal_sr, winlen=args.winlen, winstep=args.winstep,
-                       nfilt=args.nfilt, nfft=args.nfft, preemph=args.preemph)
-    logfbank_features = logfbank(signal)
+    signal, _ = torchaudio.load(signal_path)
 
-    mfcc = MFCCs(samplerate=args.signal_sr, winlen=args.winlen, winstep=args.winstep, numcep=args.numcep,
-                 nfilt=args.nfilt, nfft=args.nfft, preemph=args.preemph, ceplifter=args.ceplifter)
-    mfcc_features = mfcc(signal)[:, 1:]
+    melkwargs = {
+        'n_mels': args.nfilt,
+        'n_fft': args.nfft,
+        'win_length': int(args.winlen * args.signal_sr),
+        'hop_length': int(args.winstep * args.signal_sr)
+    }
 
-    num_frames = mfcc_features.shape[0]
+    spectrogram = torchaudio.transforms.Spectrogram(n_fft=args.nfft,
+                                                    win_length=int(args.winlen * args.signal_sr),
+                                                    hop_length=int(args.winstep * args.signal_sr))(signal)
 
-    plot(logfbank_features, mfcc_features, num_frames)
+    mel_spectrogram = torchaudio.transforms.MelSpectrogram(sample_rate=args.signal_sr,
+                                                           n_fft=args.nfft,
+                                                           n_mels=args.nfilt,
+                                                           win_length=int(args.winlen * args.signal_sr),
+                                                           hop_length=int(args.winstep * args.signal_sr))(signal)
+
+    mfcc = torchaudio.transforms.MFCC(sample_rate=args.signal_sr,
+                                      n_mfcc=args.numcep,
+                                      log_mels=True,
+                                      melkwargs=melkwargs)(signal)
+
+    num_frames = spectrogram.size()[2]
+
+    plot(args, spectrogram, mel_spectrogram, mfcc, num_frames)
     plt.show()
 
 
