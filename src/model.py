@@ -315,8 +315,11 @@ class AbdModel(nn.Module):
 
             nn.Flatten(start_dim=1),
             nn.Linear(in_features=128 * (args.nfeature//16) * (args.signal_width//16), out_features=256),
+            nn.ReLU(),
             nn.Linear(in_features=256, out_features=128),
+            nn.ReLU(),
             nn.Linear(in_features=128, out_features=64),
+            nn.ReLU(),
             nn.Linear(in_features=64, out_features=args.nclass),
         )
 
