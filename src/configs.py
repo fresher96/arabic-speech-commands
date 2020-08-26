@@ -23,7 +23,7 @@ def set_defaults():
     parser.add_argument('--silence_vol', type=float, default=0.5, help='')
 
     # augmentations LogFBEs | MFCCs
-    parser.add_argument('--features_name', type=str, default='ta.MFCCs',
+    parser.add_argument('--features_name', type=str, default='ta.LogFBEs',
                         help='LogFBEs | MFCCs | ta.MFCCs | ta.LogFBEs')
     parser.add_argument('--nfilt', type=int, default=40, help='')
     parser.add_argument('--numcep', type=int, default=13, help='')
@@ -70,8 +70,8 @@ def set_defaults():
     parser.add_argument('--scheduler_factor', type=float, default=0.1, help='')
 
     # model architecture
-    parser.add_argument('--model', type=str, default='DNN',
-                        help='LogisticRegression | CompressModel | ConvNet | ResNet | MatlabModel | DNN')
+    parser.add_argument('--model', type=str, default='AbdModel',
+                        help='LogisticRegression | CompressModel | ConvNet | ResNet | MatlabModel')
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--nlayer', type=int, default=3)
     parser.add_argument('--nchannel', type=int, default=8)

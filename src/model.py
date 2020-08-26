@@ -295,15 +295,27 @@ class AbdModel(nn.Module):
 
         # input dims: batchsize | channels = 1 | height = args.nfeature | width = args.signal_width
         self.layers = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=args.nchannel, kernel_size=3, padding=1),
-            nn.BatchNorm2d(num_features=args.nchannel),
+            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, padding=1),
             nn.ReLU(),
-
             nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Dropout2d(p=args.dropout),
+
+            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            nn.Dropout2d(p=0.25),
 
             nn.Flatten(start_dim=1),
-            nn.Linear(in_features=args.nchannel * (args.nfeature//2) * (args.signal_width//2), out_features=args.nclass),
+            nn.Linear(in_features=128 * (args.nfeature//16) * (args.signal_width//16), out_features=256),
+            nn.Linear(in_features=256, out_features=args.nclass),
         )
 
     def forward(self, x):
