@@ -344,14 +344,28 @@ class LSTM(nn.Module):
 
         # input dims: batchsize | channels = 1 | height = args.nfeature | width = args.signal_width
         self.layers = nn.Sequential(
-            nn.LSTM(input_size=args.nfeature, hidden_size=128, num_layers=2, batch_first=True),
-            nn.Dropout2d(p=0.5),
+            nn.LSTM(input_size=frq, hidden_size=128, num_layers=2, batch_first=True),
+            # nn.Dropout(p=0.5),
+        )
+
+        self.layers2 = nn.Sequential(
+            nn.Dropout(0.5),
+
+            nn.Conv1d(in_channels=128, out_channels=128, kernel_size=1),
+            nn.ReLU(),
+
+            nn.Conv1d(in_channels=128, out_channels=64, kernel_size=1),
+            nn.ReLU(),
 
             nn.Flatten(start_dim=1),
-            nn.Linear(in_features=64, out_features=args.nclass),
+            nn.Linear(in_features=64 * tim, out_features=args.nclass),
         )
 
     def forward(self, x):
-        x = x.unsqueeze(1)
+        x = x.squeeze(1)
         x = x.permute(0, 2, 1)
-        return self.layers(x)
+        x = self.layers(x)
+        x = x[0]
+        x = x.permute(0, 2, 1)
+        x = self.layers2(x)
+        return x
