@@ -76,7 +76,8 @@ def set_defaults():
     parser.add_argument('--nlayer', type=int, default=3)
     parser.add_argument('--nchannel', type=int, default=8)
     parser.add_argument('--res_pool', type=int, default=[1, 1], nargs=2)
-    parser.add_argument('--use_dilation', action='store_true', default=True)
+    parser.add_argument('--use_dilation', action='store_true', default=False)
+    parser.add_argument('--use_augmentation', action='store_true', default=False)
 
     # streaming audio
     parser.add_argument('--p_threshold', type=float, default=0.7)

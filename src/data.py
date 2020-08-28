@@ -128,12 +128,25 @@ def get_transform(args):
     else:
         raise Exception('--features_name should be one of {LogFBEs | MFCCs | ta.MFCCs | ta.LogFBEs}')
 
+    def debug(x):
+        print(x.size());
+        return x;
 
     # Composing transforms
-    test_trasform = transforms.Compose([
-        features,
-        transforms.Lambda(lambda x: x.unsqueeze(0)),
-    ])
+    if args.use_augmentation:
+        args.nfeature -= 1;
+        test_trasform = transforms.Compose([
+            features,
+            transforms.Lambda(lambda x: debug(x)),
+            transforms.Lambda(lambda x: x[1:]),
+            transforms.Lambda(lambda x: debug(x)),
+            transforms.Lambda(lambda x: x.unsqueeze(0)),
+        ])
+    else:
+        test_trasform = transforms.Compose([
+            features,
+            transforms.Lambda(lambda x: x.unsqueeze(0)),
+        ])
 
     silence_transform = transforms.Compose([
         transforms.Lambda(lambda x: x * random.uniform(0.0, args.silence_vol)),
@@ -142,10 +155,6 @@ def get_transform(args):
 
     args.signal_samples = int(args.signal_sr * args.signal_len)
     args.bkg_noise_path = 'background_noise'
-
-    def debug(x):
-        print(x.size());
-        return x;
 
     train_transform = transforms.Compose([
         transforms.TimeShifting2(shift_min=args.shift_min, shift_max=args.shift_max),
