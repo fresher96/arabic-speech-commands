@@ -295,12 +295,14 @@ class CNN(nn.Module):
         super().__init__()
         self.name = self.__class__.__name__;
 
+        tmp = (2 if args.nfeature >= 16 else 1, 2)
+
         # input dims: batchsize | channels = 1 | height = args.nfeature | width = args.signal_width
         self.layers = nn.Sequential(
             nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, padding=1),
             nn.BatchNorm2d(num_features=16),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.MaxPool2d(kernel_size=tmp, stride=tmp),
 
             nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
             nn.BatchNorm2d(num_features=32),
@@ -321,7 +323,7 @@ class CNN(nn.Module):
 
             nn.Flatten(start_dim=1),
 
-            nn.Linear(in_features=128 * (args.nfeature//16) * (args.signal_width//16), out_features=256),
+            nn.Linear(in_features=128 * (args.nfeature//8//tmp[0]) * (args.signal_width//16), out_features=256),
             nn.ReLU(),
             nn.Linear(in_features=256, out_features=args.nclass),
 
