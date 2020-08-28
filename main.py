@@ -21,7 +21,11 @@ def run():
 
     trainer = ModelTrainer(model, dataloader, args);
 
-    trainer.train() if not args.test else trainer.test();
+    trainer.train()
+
+    if(args.test):
+        trainer.test()
+
 
 
 if __name__ == '__main__':

@@ -59,7 +59,7 @@ def set_defaults():
 
     # training configs
     parser.add_argument('--weight_decay', type=float, default=1e-5)
-    parser.add_argument('--nepoch', type=int, default=6, help='number of epochs to train for')
+    parser.add_argument('--nepoch', type=int, default=2, help='number of epochs to train for')
     parser.add_argument('--batchsize', type=int, default=32, help='input batch size')
     parser.add_argument('--metric', type=str, default='acc', help='')
     parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
@@ -70,7 +70,7 @@ def set_defaults():
     parser.add_argument('--scheduler_factor', type=float, default=0.1, help='')
 
     # model architecture
-    parser.add_argument('--model', type=str, default='LSTM',
+    parser.add_argument('--model', type=str, default='CNN',
                         help='LogisticRegression | CompressModel | ConvNet | ResNet | DNN | CNN | LSTM | MatlabModel')
     parser.add_argument('--dropout', type=float, default=0.5)
     parser.add_argument('--nlayer', type=int, default=3)
