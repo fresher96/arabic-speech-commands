@@ -16,6 +16,7 @@ def load_model(args):
     model = model_constructor(args);
     return model;
 
+
 class StreamingAudio:
 
     def __init__(self, args):
