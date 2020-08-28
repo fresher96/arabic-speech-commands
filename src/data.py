@@ -133,7 +133,7 @@ def get_transform(args):
         return x;
 
     # Composing transforms
-    if args.use_augmentation:
+    if args.no_augmentations:
         args.nfeature -= 1;
         test_trasform = transforms.Compose([
             features,
@@ -154,7 +154,7 @@ def get_transform(args):
     args.signal_samples = int(args.signal_sr * args.signal_len)
     args.bkg_noise_path = 'background_noise'
 
-    if(args.use_augmentation):
+    if(args.no_augmentations):
         train_transform = test_trasform
     else:
         train_transform = transforms.Compose([
