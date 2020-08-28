@@ -7,13 +7,13 @@ import torchaudio
 
 
 def plot(args, spectrogram, mel_spectrogram, mfcc, num_frames):
-    plt.figure(13, figsize=(13.5, 6.5))
+    plt.figure(1, figsize=(8, 8))
     plt.subplots_adjust(left=0.08, right=1.1, bottom=0.08, top=0.95, hspace=0.75)
 
     plt.subplot(311)
     img = plt.imshow(np.log(spectrogram[0, :, :].numpy()), origin='lower', aspect='auto')
     plt.colorbar(img)
-    plt.title('Spectrogram')
+    plt.title(r'$\bf{(a) \ Spectrogram}$')
     plt.xlabel('Time (s)')
     plt.xlim(0, num_frames - 1)
     plt.xticks(np.linspace(0, num_frames - 1, 6), np.round(np.arange(0, 1.1, 0.2), decimals=1))
@@ -24,7 +24,7 @@ def plot(args, spectrogram, mel_spectrogram, mfcc, num_frames):
     plt.subplot(312)
     img = plt.imshow(np.log(mel_spectrogram[0, :, :].numpy()), origin='lower', aspect='auto')
     plt.colorbar(img)
-    plt.title('Log Filterbank Energies (LogFBEs)')
+    plt.title(r'$\bf{(b) \ LogFBEs}$')
     plt.xlabel('Time (s)')
     plt.xlim(0, num_frames - 1)
     plt.xticks(np.linspace(0, num_frames - 1, 6), np.round(np.arange(0, 1.1, 0.2), decimals=1))
@@ -33,14 +33,14 @@ def plot(args, spectrogram, mel_spectrogram, mfcc, num_frames):
     plt.subplot(313)
     img = plt.imshow(mfcc[0, 1:, :].numpy(), origin='lower', aspect='auto')
     plt.colorbar(img)
-    plt.title('Mel-Frequency Cepstral Coefficients (MFCCs)')
+    plt.title(r'$\bf{(c) \ MFCCs}$')
     plt.xlabel('Time (s)')
     plt.xlim(0, num_frames - 1)
     plt.xticks(np.linspace(0, num_frames - 1, 6), np.round(np.arange(0, 1.1, 0.2), decimals=1))
     plt.ylabel('Cepstrum index')
     y_ticks = np.arange(0, mfcc.size()[1] - 1, step=2)
     plt.yticks(y_ticks, y_ticks + 1)
-    plt.savefig('../output/LogFBEs and MFCCs.png', bbox_inches='tight')
+    plt.savefig('../output/Spectrogram, LogFBEs, and MFCCs.png', bbox_inches='tight')
 
 
 def main():
