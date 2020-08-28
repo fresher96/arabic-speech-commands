@@ -137,9 +137,7 @@ def get_transform(args):
         args.nfeature -= 1;
         test_trasform = transforms.Compose([
             features,
-            transforms.Lambda(lambda x: debug(x)),
             transforms.Lambda(lambda x: x[1:]),
-            transforms.Lambda(lambda x: debug(x)),
             transforms.Lambda(lambda x: x.unsqueeze(0)),
         ])
     else:
@@ -156,16 +154,19 @@ def get_transform(args):
     args.signal_samples = int(args.signal_sr * args.signal_len)
     args.bkg_noise_path = 'background_noise'
 
-    train_transform = transforms.Compose([
-        transforms.TimeShifting2(shift_min=args.shift_min, shift_max=args.shift_max),
-        transforms.AddNoise3(
-            os.path.join(args.data_root, args.bkg_noise_path),
-            args.noise_vol, args.signal_samples, args.signal_sr),
-        test_trasform,
-        torchaudio.transforms.TimeMasking(args.mask_time),
-        torchaudio.transforms.TimeMasking(args.mask_time),
-        torchaudio.transforms.FrequencyMasking(args.mask_freq),
-    ])
+    if(args.use_augmentation):
+        train_transform = test_trasform
+    else:
+        train_transform = transforms.Compose([
+            transforms.TimeShifting2(shift_min=args.shift_min, shift_max=args.shift_max),
+            transforms.AddNoise3(
+                os.path.join(args.data_root, args.bkg_noise_path),
+                args.noise_vol, args.signal_samples, args.signal_sr),
+            test_trasform,
+            torchaudio.transforms.TimeMasking(args.mask_time),
+            torchaudio.transforms.TimeMasking(args.mask_time),
+            torchaudio.transforms.FrequencyMasking(args.mask_freq),
+        ])
 
     return {'train': train_transform, 'val': test_trasform, 'test': test_trasform}, silence_transform
 
