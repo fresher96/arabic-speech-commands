@@ -251,7 +251,7 @@ class AddNoise3:
         start_index = np.random.randint(0, signal.size()[0] - self.signal_samples)
         silence = signal[start_index : start_index + self.signal_samples]
 
-        return old_signal + silence * self.noise_vol
+        return old_signal + silence * random.uniform(0.0, self.noise_vol)
 
 
 class RandomApplyTransform():
