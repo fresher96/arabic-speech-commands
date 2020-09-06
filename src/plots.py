@@ -1,12 +1,14 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
+import json
 
 from configs import get_args
 import torchaudio
 
 
-def plot(args, spectrogram, mel_spectrogram, mfcc, num_frames):
+def plot_features(args, spectrogram, mel_spectrogram, mfcc, num_frames):
     plt.figure(1, figsize=(8, 8))
     plt.subplots_adjust(left=0.08, right=1.1, bottom=0.08, top=0.95, hspace=0.75)
 
@@ -41,6 +43,36 @@ def plot(args, spectrogram, mel_spectrogram, mfcc, num_frames):
     y_ticks = np.arange(0, mfcc.size()[1] - 1, step=2)
     plt.yticks(y_ticks, y_ticks + 1)
     plt.savefig('../output/Spectrogram, LogFBEs, and MFCCs.png', bbox_inches='tight')
+
+
+def plot_history(args, history):
+    # Plot training and validation accuracy values
+    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(8, 8))
+    fig.subplots_adjust(hspace=0.5)
+    legend = ['Training', 'Validation']
+
+    axes[0].plot(np.array(history[0]["y"]), color='blue')
+    axes[0].plot(np.array(history[2]["y"]), color='black')
+    axes[0].set_title('Accuracy (%)')
+    axes[0].set_xlabel('Epoch')
+    axes[0].legend(legend, loc='lower right')
+    axes[0].xaxis.set_major_locator(MultipleLocator(base=5))
+    axes[0].yaxis.set_major_locator(MultipleLocator(base=10))
+    # Add the grid
+    axes[0].grid(which='major', axis='both', linestyle='dotted')
+
+    # Plot training and validation loss values
+    axes[1].plot(history[1]["y"], color='red')
+    axes[1].plot(history[3]["y"], color='black')
+    axes[1].set_title('Loss')
+    axes[1].set_xlabel('Epoch')
+    axes[1].legend(legend, loc='upper right')
+    axes[1].xaxis.set_major_locator(MultipleLocator(base=5))
+    axes[1].yaxis.set_major_locator(MultipleLocator(base=0.5))
+    # Add the grid
+    axes[1].grid(which='major', axis='both', linestyle='dotted')
+
+    plt.savefig('../output/History.png', bbox_inches='tight')
 
 
 def main():
@@ -79,7 +111,16 @@ def main():
 
     num_frames = spectrogram.size()[2]
 
-    plot(args, spectrogram, mel_spectrogram, mfcc, num_frames)
+    plot_features(args, spectrogram, mel_spectrogram, mfcc, num_frames)
+
+    history_path = os.path.join('..', 'assets', 'history.json')
+
+    # Load the history file
+    with open(history_path, mode='rb') as history_file:
+        history = json.load(history_file)
+
+    plot_history(args, history)
+
     plt.show()
 
 
