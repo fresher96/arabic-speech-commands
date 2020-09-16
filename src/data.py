@@ -1,14 +1,12 @@
 import torch
 import numpy as np
 import os
-from scipy.io import wavfile
 import torchaudio
 
 
 from src import utils
 from src import transforms
 from src.ClassDict import ClassDict
-from src import load
 import random
 
 
@@ -35,15 +33,15 @@ class ASCDataset(torch.utils.data.Dataset):
         self.silence_label = ClassDict.len()
 
         self.nfl, self.npd = utils.get_noise_files(noise_pkg, signal_sr)
-        self.noise_pkg = noise_pkg;
+        self.noise_pkg = noise_pkg
 
-        self.cache = [];
+        self.cache = []
         for idx in range(len(self.audio_files)):
             file_path = os.path.join(self.data_root, self.audio_files[idx])
             x = self.load_path(file_path)
-            self.cache.append(x);
+            self.cache.append(x)
 
-        self.s_cache = {};
+        self.s_cache = {}
         for file_name in self.nfl:
             file_path = os.path.join(self.noise_pkg, file_name)
             signal = self.load_path(file_path)
@@ -89,8 +87,8 @@ def get_transform(args):
         'n_fft': args.nfft,
         'win_length': int(args.winlen * args.signal_sr),
         'hop_length': int(args.winstep * args.signal_sr),
-    };
-    args.signal_samples = int(args.signal_sr * args.signal_len);
+    }
+    args.signal_samples = int(args.signal_sr * args.signal_len)
 
     args.signal_width = int(np.ceil((args.signal_len - args.winlen) / args.winstep) + 1)
     if args.features_name.lower() == 'logfbes':
@@ -113,25 +111,25 @@ def get_transform(args):
         features = transforms.Compose([
             torchaudio.transforms.MFCC(sample_rate=args.signal_sr, n_mfcc=args.numcep, log_mels=True, melkwargs=melkwargs),
             transforms.Lambda(lambda x: x[1:]),
-        ]);
+        ])
         args.nfeature = args.numcep - 1
         args.signal_width = 1 + args.signal_samples // melkwargs['hop_length']
-        # args.signal_width = 81;
+        # args.signal_width = 81
     elif args.features_name.lower() == 'ta.logfbes':
-        log_offset = 1e-6;
+        log_offset = 1e-6
         features = transforms.Compose([
             torchaudio.transforms.MelSpectrogram(sample_rate=args.signal_sr, **melkwargs),
             transforms.Lambda(lambda t: torch.log(t + log_offset)),
-        ]);
+        ])
         args.nfeature = args.nfilt
         args.signal_width = 1 + args.signal_samples // melkwargs['hop_length']
-        # args.signal_width = 81;
+        # args.signal_width = 81
     else:
         raise Exception('--features_name should be one of {LogFBEs | MFCCs | ta.MFCCs | ta.LogFBEs}')
 
     def debug(x):
-        print(x.size());
-        return x;
+        print(x.size())
+        return x
 
     # Composing transforms
     test_trasform = transforms.Compose([
@@ -147,7 +145,7 @@ def get_transform(args):
     args.signal_samples = int(args.signal_sr * args.signal_len)
     args.bkg_noise_path = 'background_noise'
 
-    if(args.no_augmentations):
+    if args.no_augmentations:
         train_transform = test_trasform
     else:
         train_transform = transforms.Compose([
@@ -186,5 +184,3 @@ def get_dataloader(args):
                   for split in splits}
 
     return dataloader
-
-

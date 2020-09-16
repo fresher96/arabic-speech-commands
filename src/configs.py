@@ -47,7 +47,6 @@ def set_defaults():
     parser.add_argument('--mask_time', type=int, default=12)
     parser.add_argument('--mask_freq', type=int, default=8)
 
-
     # experiment configs
     parser.add_argument('--name', type=str, default='untitled', help='name of the experiment')
     parser.add_argument('--outf', type=str, default='./output', help='folder to output images and model checkpoints')

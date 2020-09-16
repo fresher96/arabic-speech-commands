@@ -6,30 +6,28 @@ from src.model import *
 
 
 def load_model(args):
-    model_constructor = globals()[args.model];
-    model = model_constructor(args);
-    return model;
+    model_constructor = globals()[args.model]
+    model = model_constructor(args)
+    return model
 
 
 def run():
 
-    args = get_args();
+    args = get_args()
 
-    dataloader = get_dataloader(args);
+    dataloader = get_dataloader(args)
 
-    model = load_model(args);
+    model = load_model(args)
 
-    trainer = ModelTrainer(model, dataloader, args);
+    trainer = ModelTrainer(model, dataloader, args)
 
     trainer.train()
 
-    if(args.test):
+    if args.test:
         trainer.test()
 
 
-
 if __name__ == '__main__':
-    run();
-    print('done');
-    exit();
-
+    run()
+    print('done')
+    exit()

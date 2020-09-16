@@ -155,8 +155,8 @@ class LogFBEs:
 
     def __call__(self, signal):
         features = logfbank(signal, samplerate=self.samplerate, winlen=self.winlen,
-                        winstep=self.winstep, nfilt=self.nfilt, nfft=self.nfft,
-                        preemph=self.preemph)
+                            winstep=self.winstep, nfilt=self.nfilt, nfft=self.nfft,
+                            preemph=self.preemph)
         return features
 
     def __repr__(self):
@@ -220,9 +220,10 @@ class AddNoise2:
         file_path = os.path.join(self.noise_pkg, file_name)
         signal = self.load_path(file_path)
         start_index = np.random.randint(0, signal.size()[0] - self.signal_samples)
-        silence = signal[start_index : start_index + self.signal_samples]
+        silence = signal[start_index: start_index + self.signal_samples]
 
         return old_signal + silence * self.noise_vol
+
 
 class AddNoise3:
 
@@ -232,7 +233,7 @@ class AddNoise3:
         self.noise_vol = noise_vol
         self.signal_samples = signal_samples
 
-        self.cache = {};
+        self.cache = {}
         for file_name in self.nfl:
             file_path = os.path.join(self.noise_pkg, file_name)
             signal = self.load_path(file_path)
@@ -247,19 +248,19 @@ class AddNoise3:
         file_name = np.random.choice(self.nfl, p=self.npd)
         # file_path = os.path.join(self.noise_pkg, file_name)
         # signal = self.load_path(file_path)
-        signal = self.cache[file_name];
+        signal = self.cache[file_name]
         start_index = np.random.randint(0, signal.size()[0] - self.signal_samples)
-        silence = signal[start_index : start_index + self.signal_samples]
+        silence = signal[start_index: start_index + self.signal_samples]
 
         return old_signal + silence * random.uniform(0.0, self.noise_vol)
 
 
-class RandomApplyTransform():
+class RandomApplyTransform:
     def __init__(self, p, transform):
         self.p = p
         self.transform = transform
 
     def __call__(self, signal):
-        if(random.random() < self.p):
-            signal = self.transform(signal);
-        return signal;
+        if random.random() < self.p:
+            signal = self.transform(signal)
+        return signal
