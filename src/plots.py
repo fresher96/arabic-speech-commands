@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 import json
@@ -115,9 +114,6 @@ def main():
     plot_features(args, spectrogram, mel_spectrogram, mfcc, num_frames)
 
     history_path = os.path.join('..', 'assets', 'history.json')
-
-    sns.set_style("darkgrid", {"axes.facecolor": ".9"})
-    # sns.set_style("darkgrid")
 
     # Load the history file
     with open(history_path, mode='rb') as history_file:
