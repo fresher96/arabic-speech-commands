@@ -21,6 +21,7 @@ class ModelTrainer:
         self.data = dataloader
         self.metric = args.metric
         self.frq_log = len(dataloader['train']) // args.frq_log
+        self.transform = None
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         model.to(self.device)
@@ -49,6 +50,7 @@ class ModelTrainer:
         self.experiment.set_name(args.name)
         self.experiment.log_parameters(vars(args))
         self.experiment.set_model_graph(str(self.model))
+
 
     def train_one_epoch(self, epoch):
 
@@ -131,7 +133,7 @@ class ModelTrainer:
                 elif self.args.scheduler == 'auto':
                     self.scheduler.step(train_res['loss'])
         finally:
-            print(">> Training model %s.[Stopped]" % self.model.name)
+            print(">> Training model %s. [Stopped]" % self.model.name)
             self.experiment.log_asset_folder(os.path.join(self.args.outf, self.args.name, 'weights'),
                                              step=None, log_file_name=False, recursive=False)
             if self.args.scheduler == 'set':
