@@ -369,10 +369,10 @@ class LSTM(nn.Module):
         )
 
     def forward(self, x):
-        x = x.squeeze(1)
-        x = x.permute(0, 2, 1)
-        x = self.layers(x)
-        x = x[0]
-        x = x.permute(0, 2, 1)
-        x = self.layers2(x)
+        x = x.squeeze(1)            # bs | h | w
+        x = x.permute(0, 2, 1)      # bs | w | h
+        x = self.layers(x)          # (bs | w | 128) | ...
+        x = x[0]                    # bs | w | 128
+        x = x.permute(0, 2, 1)      # bs | 128 | w
+        x = self.layers2(x)         # bs | nclass
         return x
