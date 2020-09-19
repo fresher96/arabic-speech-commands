@@ -7,3 +7,5 @@ torchaudio
 librosa
 pyaudio
 matplotlib
+sklearn
+tqdm

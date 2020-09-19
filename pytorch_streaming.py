@@ -12,9 +12,9 @@ from src.ClassDict import ClassDict
 
 
 def load_model(args):
-    model_constructor = globals()[args.model];
-    model = model_constructor(args);
-    return model;
+    model_constructor = globals()[args.model]
+    model = model_constructor(args)
+    return model
 
 
 class StreamingAudio:

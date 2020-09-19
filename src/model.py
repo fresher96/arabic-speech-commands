@@ -11,13 +11,13 @@ class LogisticRegression(nn.Module):
         self.name = self.__class__.__name__
 
         self.input_shape = args.nfeature * args.signal_width
-        self.dropout = nn.Dropout(p=args.dropout);
+        self.dropout = nn.Dropout(p=args.dropout)
         self.fc = nn.Linear(self.input_shape, args.nclass)
 
     def forward(self, x):
-        # print(x.size());
+        # print(x.size())
         x = x.view(-1, self.input_shape)
-        x = self.dropout(x);
+        x = self.dropout(x)
         x = self.fc(x)
         return x
 
@@ -32,13 +32,13 @@ class CompressModel(nn.Module):
         self.input_shape = args.nfeature * args.signal_width
         self.h = args.nchannel
 
-        self.dropout = nn.Dropout(p=args.dropout);
+        self.dropout = nn.Dropout(p=args.dropout)
         self.fc1 = nn.Linear(self.input_shape, self.h, bias=False)
         self.fc2 = nn.Linear(self.h, args.nclass)
 
     def forward(self, x):
         x = x.view(-1, self.input_shape)
-        x = self.dropout(x);
+        x = self.dropout(x)
         x = self.fc1(x)
         x = self.fc2(x)
         return x
@@ -55,16 +55,16 @@ class DNN(nn.Module):
         self.h = args.nchannel
         self.l = args.nlayer + 1
 
-        self.dropout = nn.Dropout(p=args.dropout);
+        self.dropout = nn.Dropout(p=args.dropout)
         self.layers = nn.Sequential()
 
         fin = self.input_shape
         for i in range(self.l):
             fout = args.nclass if i == self.l - 1 else self.h
-            self.layers.add_module('l_%02d'%i, nn.Linear(fin, fout))
-            if(i != self.l - 1):
-                self.layers.add_module('bn_%02d'%i, nn.BatchNorm1d(fout))
-                self.layers.add_module('a_%02d'%i, nn.ReLU())
+            self.layers.add_module('l_%02d' % i, nn.Linear(fin, fout))
+            if i != self.l - 1:
+                self.layers.add_module('bn_%02d' % i, nn.BatchNorm1d(fout))
+                self.layers.add_module('a_%02d' % i, nn.ReLU())
             fin = fout
 
     def forward(self, x):
@@ -84,23 +84,23 @@ class ConvNet(nn.Module):
         def block(in_filters, out_filters, bn):
             block = [nn.Conv2d(in_filters, out_filters, 3, bias=not bn)]
             if bn: block.append(nn.BatchNorm2d(out_filters))
-            block += [nn.ReLU()];
-            return nn.Sequential(*block);
+            block += [nn.ReLU()]
+            return nn.Sequential(*block)
 
-        init_fm = args.nchannel;
-        self.conv = nn.Sequential();
-        self.conv.add_module('conv_%d' % 0, block(1, init_fm, False));
+        init_fm = args.nchannel
+        self.conv = nn.Sequential()
+        self.conv.add_module('conv_%d' % 0, block(1, init_fm, False))
 
         for i in range(1, args.nlayer):
             i -= 1
-            self.conv.add_module('conv_%d'%(i+1), block(2**i * init_fm, 2**(i+1) * init_fm, True));
+            self.conv.add_module('conv_%d'%(i+1), block(2**i * init_fm, 2**(i+1) * init_fm, True))
 
         self.fc = nn.Sequential(
             # nn.Linear(2 ** (args.nlayer - 1) * init_fm, 10, bias=False),
             # nn.Linear(10, args.nclass),
             nn.Dropout(p=args.dropout),
             nn.Linear(2 ** (args.nlayer - 1) * init_fm, args.nclass),
-        );
+        )
 
     def forward(self, x):
         x = self.conv(x)
@@ -115,7 +115,7 @@ class ResNet(nn.Module):
     def __init__(self, args):
         super().__init__()
 
-        self.name = self.__class__.__name__;
+        self.name = self.__class__.__name__
 
         n_labels = args.nclass
         n_maps = args.nchannel
@@ -124,7 +124,7 @@ class ResNet(nn.Module):
         if args.res_pool != (1, 1):
             self.pool = nn.AvgPool2d(args.res_pool)
 
-        self.n_layers = n_layers = args.nlayer;
+        self.n_layers = n_layers = args.nlayer
         dilation = args.use_dilation
 
         if dilation:
@@ -156,10 +156,10 @@ class ResNet(nn.Module):
             if i > 0:
                 x = getattr(self, "bn{}".format(i))(x)
 
-        x = x.view(x.size(0), x.size(1), -1) # shape: (batch, feats, o3)
+        # shape: (batch, feats, o3)
+        x = x.view(x.size(0), x.size(1), -1)
         x = torch.mean(x, 2)
         return self.output(x)
-
 
 
 class MatlabModel(nn.Module):
@@ -202,7 +202,7 @@ class MatlabModel(nn.Module):
         fullyConnectedLayer(numClasses)
         softmaxLayer
         weightedClassificationLayer(classWeights)
-    ];
+    ]
 
     !python main.py \
         --comet_key 'bLjz3xx3gKDZwM7Hm0Kcgbpww' --comet_project 'arabic-commands' --comet_workspace 'fresher96' \
@@ -230,22 +230,22 @@ class MatlabModel(nn.Module):
 
     def __init__(self, args):
         super().__init__()
-        self.name = self.__class__.__name__;
+        self.name = self.__class__.__name__
 
-        numF = args.nchannel; # change to 40 or 41?
+        numF = args.nchannel # change to 40 or 41?
 
-        w = args.signal_width;
-        w = (w - 1) // 2 + 1;
-        w = (w - 1) // 2 + 1;
-        w = (w - 1) // 2 + 1;
+        w = args.signal_width
+        w = (w - 1) // 2 + 1
+        w = (w - 1) // 2 + 1
+        w = (w - 1) // 2 + 1
 
-        h = args.nfeature;
-        h = (h - 1) // 2 + 1;
-        h = (h - 1) // 2 + 1;
-        h = (h - 1) // 2 + 1;
+        h = args.nfeature
+        h = (h - 1) // 2 + 1
+        h = (h - 1) // 2 + 1
+        h = (h - 1) // 2 + 1
 
-        s = 2;
-        p = 1;
+        s = 2
+        p = 1
 
         # input dims: batchsize | channels = 1 | height = args.nfeature | width = args.signal_width
         self.layers = nn.Sequential(
@@ -282,18 +282,17 @@ class MatlabModel(nn.Module):
             # nn.Linear(in_features=4 * numF * h * 1, out_features=10, bias=False),
             # nn.Linear(in_features=10, out_features=args.nclass),
             nn.Linear(in_features=4 * numF * h * 1, out_features=args.nclass),
-        );
+        )
 
     def forward(self, x):
-        return self.layers(x);
-
+        return self.layers(x)
 
 
 class CNN(nn.Module):
 
     def __init__(self, args):
         super().__init__()
-        self.name = self.__class__.__name__;
+        self.name = self.__class__.__name__
 
         tmp = (2 if args.nfeature >= 16 else 1, 2)
 
@@ -340,12 +339,11 @@ class CNN(nn.Module):
         return self.layers(x)
 
 
-
 class LSTM(nn.Module):
 
     def __init__(self, args):
         super().__init__()
-        self.name = self.__class__.__name__;
+        self.name = self.__class__.__name__
 
         frq = args.nfeature
         tim = args.signal_width
