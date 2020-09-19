@@ -49,8 +49,6 @@ class ASCDataset(torch.utils.data.Dataset):
 
     def load_silence(self):
         file_name = np.random.choice(self.nfl, p=self.npd)
-        # file_path = os.path.join(self.noise_pkg, file_name)
-        # signal = self.load_path(file_path)
         signal = self.s_cache[file_name]
         start_index = np.random.randint(0, signal.size()[0] - self.signal_samples)
         silence = signal[start_index : start_index + self.signal_samples]
@@ -64,8 +62,6 @@ class ASCDataset(torch.utils.data.Dataset):
         return x
 
     def load_audio(self, idx):
-        # file_path = os.path.join(self.data_root, self.audio_files[idx])
-        # x = self.load_path(file_path)
         x = self.cache[idx]
         tensor = self.transform(x)
         return tensor
@@ -82,15 +78,15 @@ class ASCDataset(torch.utils.data.Dataset):
 
 def get_transform(args):
 
+    args.signal_samples = int(args.signal_sr * args.signal_len)
+    args.signal_width = int(np.ceil((args.signal_len - args.winlen) / args.winstep) + 1)
     melkwargs = {
         'n_mels': args.nfilt,
         'n_fft': args.nfft,
         'win_length': int(args.winlen * args.signal_sr),
         'hop_length': int(args.winstep * args.signal_sr),
     }
-    args.signal_samples = int(args.signal_sr * args.signal_len)
 
-    args.signal_width = int(np.ceil((args.signal_len - args.winlen) / args.winstep) + 1)
     if args.features_name.lower() == 'logfbes':
         features = transforms.Compose([
             transforms.LogFBEs(args.signal_sr, args.winlen, args.winstep, args.nfilt,

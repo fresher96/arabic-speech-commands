@@ -165,8 +165,7 @@ class ResNet(nn.Module):
 class MatlabModel(nn.Module):
 
     """
-    Taken from:
-    https://www.mathworks.com/help/deeplearning/ug/deep-learning-speech-recognition.html
+    adapted from: https://www.mathworks.com/help/deeplearning/ug/deep-learning-speech-recognition.html
 
     layers = [
         imageInputLayer([numHops numBands])

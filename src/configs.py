@@ -30,12 +30,8 @@ def set_defaults():
     parser.add_argument('--winlen', type=float, default=0.025, help='')
     parser.add_argument('--winstep', type=float, default=0.010, help='')
     parser.add_argument('--nfft', type=int, default=512, help='')
-    parser.add_argument('--preemph', type=float, default=0.97, help='')
-    parser.add_argument('--ceplifter', type=int, default=22, help='')
 
     # augmentations 1
-    parser.add_argument('--scale_min', type=float, default=0.95, help='')
-    parser.add_argument('--scale_max', type=float, default=1.1, help='')
     parser.add_argument('--shift_min', type=float, default=-0.2, help='')
     parser.add_argument('--shift_max', type=float, default=0.2, help='')
     parser.add_argument('--noise_vol', type=float, default=0.5, help='')
@@ -43,9 +39,8 @@ def set_defaults():
     parser.add_argument('--alpha_max', type=float, default=1.00, help='')
 
     # augmentations 2
-    parser.add_argument('--p_transform', type=float, default=0.2)
-    parser.add_argument('--mask_time', type=int, default=12)
-    parser.add_argument('--mask_freq', type=int, default=8)
+    parser.add_argument('--mask_time', type=int, default=8)
+    parser.add_argument('--mask_freq', type=int, default=3)
 
     # experiment configs
     parser.add_argument('--name', type=str, default='untitled', help='name of the experiment')
