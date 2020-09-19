@@ -9,6 +9,7 @@ from src.data import get_dataloader
 from src.trainer import ModelTrainer
 from src.model import *
 from src.ClassDict import ClassDict
+from src.data import get_transform
 
 
 def load_model(args):
@@ -18,14 +19,21 @@ def load_model(args):
 
 
 class StreamingAudio:
-
+    """
+    python pytorch_streaming.py --features_name MFCCs --nfilt 40 --numcep 13 --model CNN --weights_path ./output/model.pth --n_chunks 4 --p_threshold 0.7
+    """
+    
     def __init__(self, args):
         self.args = args
+        args.nclass = 41
+        args.no_augmentations = True
+        transform, _ = get_transform(args)
+        transform = transform['test']
 
-        dataloader = get_dataloader(args)
         self.model = load_model(args)
-        trainer = ModelTrainer(self.model, dataloader, args)
+        trainer = ModelTrainer(self.model, None, args)
         trainer.load_weights()
+        trainer.transform = transform
         self.model = trainer
 
         self.signal_samples = args.signal_samples

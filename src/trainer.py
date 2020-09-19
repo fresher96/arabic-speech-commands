@@ -11,6 +11,7 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 
 from src.ClassDict import ClassDict
+from src.data import get_transform
 
 
 class ModelTrainer:
@@ -20,8 +21,9 @@ class ModelTrainer:
         self.args = args
         self.data = dataloader
         self.metric = args.metric
-        self.frq_log = len(dataloader['train']) // args.frq_log
-        self.transform = None
+
+        if(dataloader is not None):
+            self.frq_log = len(dataloader['train']) // args.frq_log
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         model.to(self.device)
@@ -231,7 +233,7 @@ class ModelTrainer:
         self.model.eval()
         with torch.no_grad():
             x = torch.from_numpy(x).float()
-            x = self.data['test'].dataset.transform(x)
+            x = self.transform(x)
             x = x.unsqueeze(0)
             x = self.model(x)
             x = F.softmax(x, dim=1)
