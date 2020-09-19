@@ -22,7 +22,7 @@ class StreamingAudio:
     """
     python pytorch_streaming.py --features_name MFCCs --nfilt 40 --numcep 13 --model CNN --weights_path ./output/model.pth --n_chunks 4 --p_threshold 0.7
     """
-    
+
     def __init__(self, args):
         self.args = args
         args.nclass = 41
